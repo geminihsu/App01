@@ -1226,14 +1226,14 @@ public class JsonPutsUtil {
                             JSONObject data = jsonObject.getJSONObject(App01libObjectKey.APP_OBJECT_KEY_NOTIFICATION_INFO_MESSAGE);
                             String uid = data.getString(App01libObjectKey.APP_OBJECT_KEY_UID);
 
-                            if (uid.equals(user.getUser_uid())) {
+                            //if (uid.equals(user.getUser_uid())) {
                                 Double lat = data.getDouble(App01libObjectKey.APP_OBJECT_KEY_BOOKMARK_LOCATION_LAT);
                                 Double lng = data.getDouble(App01libObjectKey.APP_OBJECT_KEY_BOOKMARK_LOCATION_LNG);
                                 /*if (mAccountQueryUserLocationManagerCallBackFunction != null)
                                     mAccountQueryUserLocationManagerCallBackFunction.getLocationInfo(lng, lat);*/
                                 getDriverInfo(user,driverUid,lat,lng);
 
-                            }
+                            //}
 
 
                         }
@@ -1262,7 +1262,7 @@ public class JsonPutsUtil {
                 e.setStackTrace(volleyError.getStackTrace());
                 //NewRelic.noticeNetworkFailure(Constants.SERVER_URL, "Puts",System.nanoTime(), System.nanoTime(),e);
 
-                if(volleyError!=null)
+                if(volleyError.getMessage()!=null)
                     Log.e(TAG, volleyError.getMessage().toString());
             }
         });

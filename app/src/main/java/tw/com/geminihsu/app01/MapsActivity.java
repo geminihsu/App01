@@ -1,9 +1,11 @@
 package tw.com.geminihsu.app01;
 
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -13,11 +15,14 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -35,7 +40,7 @@ public class MapsActivity extends FragmentActivity implements
         GoogleApiClient.OnConnectionFailedListener,
         GoogleMap.OnMarkerDragListener,
         GoogleMap.OnMapLongClickListener,
-        View.OnClickListener{
+        View.OnClickListener {
 
     //Our Map
     private GoogleMap mMap;
@@ -58,6 +63,7 @@ public class MapsActivity extends FragmentActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+        setTitle("目前司機位置");
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -84,11 +90,10 @@ public class MapsActivity extends FragmentActivity implements
         googleApiClient.connect();
         super.onStart();
         Bundle args = getIntent().getExtras();
-        if(args!=null)
+        if (args != null)
             provide_location = args.getInt(Constants.ARG_POSITION);
 
-        if(provide_location == Constants.DISPLAY_USER_LOCATION)
-        {
+        if (provide_location == Constants.DISPLAY_USER_LOCATION) {
 
             longitude = args.getDouble("lng");
             latitude = args.getDouble("lat");
@@ -127,9 +132,7 @@ public class MapsActivity extends FragmentActivity implements
     //Function to move the map
     private void moveMap() {
         //String to display current latitude and longitude
-        String msg = latitude + ", "+longitude;
-
-        //Creating a LatLng Object to store Coordinates
+        String msg = latitude + ", " + longitude;
         LatLng latLng = new LatLng(latitude, longitude);
 
         //Adding marker to map
@@ -137,13 +140,29 @@ public class MapsActivity extends FragmentActivity implements
                 .position(latLng) //setting position
                 .draggable(true) //Making the marker draggable
                 .title("Current Location")); //Adding a title
+        mMap.getUiSettings().setMyLocationButtonEnabled(false);
 
-        //Moving the camera
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        mMap.setMyLocationEnabled(true);
+        mMap.getUiSettings().setZoomControlsEnabled(true);
+        MapsInitializer.initialize(this);
+        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+        builder.include(new LatLng(latitude, longitude));
 
-        //Animating the camera
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
-
+        LatLng coordinate = new LatLng(latitude, longitude); //Store these lat lng values somewhere. These should be constant.
+        CameraUpdate location = CameraUpdateFactory.newLatLngZoom(
+                coordinate, 17);
+        //googleMap.moveCamera(location);
+        mMap.animateCamera(location);
         //Displaying current coordinates in toast
         Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
 
