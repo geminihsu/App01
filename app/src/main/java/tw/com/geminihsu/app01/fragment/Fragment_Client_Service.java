@@ -306,6 +306,13 @@ public class Fragment_Client_Service extends Fragment {
     @Override
 	public void onStop() {
 		super.onStop();
+        if (mapView != null) {
+            try {
+                mapView.onDestroy();
+            } catch (NullPointerException e) {
+                // Log.e(TAG, "Error while attempting MapView.onDestroy(), ignoring exception", e);
+            }
+        }
         if(progressDialog_loading!=null) {
             progressDialog_loading.cancel();
             progressDialog_loading = null;

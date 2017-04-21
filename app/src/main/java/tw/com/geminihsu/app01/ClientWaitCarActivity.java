@@ -211,7 +211,7 @@ public class ClientWaitCarActivity extends Activity implements LocationListener 
         if(finishOrderBroadcastReceiver!=null)
             registerReceiver((finishOrderBroadcastReceiver), new IntentFilter("finish_order"));
 
-        sendDataRequest.getUserLocation(order,Integer.valueOf(driverUid));
+         sendDataRequest.getUserLocation(order,Integer.valueOf(driverUid));
 
 
 

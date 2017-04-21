@@ -2,12 +2,18 @@ package tw.com.geminihsu.app01;
 
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -37,6 +43,7 @@ import tw.com.geminihsu.app01.utils.RealmUtil;
 
 public class BookmarksMapListActivity extends Activity {
 
+    private final int ACTIONBAR_MENU_ITEM_SUMMIT = 0x0001;
     private ListView listView;
     private final List<BookmarkListItem> mBookmarkListData = new ArrayList<BookmarkListItem>();;
     private BookmarkListItemAdapter listViewAdapter;
@@ -77,6 +84,20 @@ public class BookmarksMapListActivity extends Activity {
 
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuItem item = menu.add(Menu.NONE, ACTIONBAR_MENU_ITEM_SUMMIT, Menu.NONE, getString(R.string.sure_take_spec));
+        SpannableString spanString = new SpannableString(item.getTitle().toString());
+        spanString.setSpan(new ForegroundColorSpan(Color.WHITE), 0, spanString.length(), 0); //fix the color to white
+        item.setTitle(spanString);
+        item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
+
+        return true;
+    }
+
+
+
 
     private void setLister()
     {
@@ -116,9 +137,19 @@ public class BookmarksMapListActivity extends Activity {
                         setResult(Constants.DESTINATION_QUERY_BOOKMARK, i);
                     else if (provide_location == Constants.STOP_QUERY_BOOKMARK)
                         setResult(Constants.STOP_QUERY_BOOKMARK, i);
-
+                    mBookmarkListData.set(position,orderItem);
                 }
-                mBookmarkListData.set(position,orderItem);
+                for(int i = 0;i<mBookmarkListData.size();i++)
+                {
+                    if(i!=position)
+                    {
+
+                        BookmarkListItem item = mBookmarkListData.get(i);
+                        item.check = false;
+                        mBookmarkListData.set(position,orderItem);
+                    }
+                }
+
                 listViewAdapter.notifyDataSetChanged();
 
 
@@ -129,8 +160,9 @@ public class BookmarksMapListActivity extends Activity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-
-
+            case ACTIONBAR_MENU_ITEM_SUMMIT:
+                this.finish();
+                return true;
             case android.R.id.home:
                 // app icon in action bar clicked; goto parent activity.
                 this.finish();

@@ -93,7 +93,7 @@ public class MenuMainActivity extends AppCompatActivity implements Fragment_Begi
             if(!isServerInfoExsit)
             myBinder.requestServerContentDetail();
             myBinder.startToGetPutNotify();
-            //myBinder.App01ServiceCheckGPS();
+            myBinder.App01ServiceCheckGPS();
         }
     };
 

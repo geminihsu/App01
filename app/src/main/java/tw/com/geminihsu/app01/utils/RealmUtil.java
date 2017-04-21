@@ -93,6 +93,12 @@ public class RealmUtil {
         return order;
     }
 
+    public RealmResults<NormalOrder> queryAllOrderList() {
+
+        RealmResults<NormalOrder> orders = mRealm.where(NormalOrder.class).findAll();
+        return orders;
+    }
+
     public RealmResults<NormalOrder> queryOrderList(String column, String value) {
 
         RealmResults<NormalOrder> orders = mRealm.where(NormalOrder.class).equalTo(column, value).findAll();

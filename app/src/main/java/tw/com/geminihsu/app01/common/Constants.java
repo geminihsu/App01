@@ -41,6 +41,8 @@ public class Constants {
 	public static final String BUNDLE_LOCATION = "map";
 	public static final String BUNDLE_MAP_LATITUDE = "latitude";
 	public static final String BUNDLE_MAP_LONGITUDE = "longitude";
+	public static final String BUNDLE_MAP_CURRENT_ADDRESS = "currAddress";
+
 
 	public final static String ACCOUNT_PHONE_NUMBER = "phoneNumber";// from
 	public final static String ACCOUNT_USERNAME = "user_name";// from

@@ -160,7 +160,7 @@ public class ClientTakeRideActivity extends Activity {
                 Bundle b = new Bundle();
                 b.putInt(Constants.ARG_POSITION, Integer.valueOf(order.getTicket_id()));
                 intent.putExtras(b);
-                startActivity(intent);
+                 startActivity(intent);
                 //finish();
             }
 
@@ -617,7 +617,7 @@ public class ClientTakeRideActivity extends Activity {
 
             case ACTIONBAR_MENU_ITEM_SUMMIT:
                 //if (option == ClientTakeRideActivity.TAKE_RIDE) {
-               if(!departure_address.getText().toString().isEmpty()&&!destination_address.getText().toString().isEmpty())
+               if(!departure_address.getText().toString().isEmpty())
                      sendOrder();
                 else
                    alert();
@@ -933,7 +933,7 @@ public class ClientTakeRideActivity extends Activity {
                 if (data!=null) {
                     departure_detail = new LocationAddress();
                     USerBookmark uSerBookmark = (USerBookmark) data.getSerializableExtra(Constants.BUNDLE_LOCATION);
-                    departure_address.setText(uSerBookmark.getStreetAddress());
+                    departure_address.setText(uSerBookmark.getLocation()+"("+uSerBookmark.getStreetAddress()+")");
                     departure_detail.setLongitude(Double.parseDouble(uSerBookmark.getLng()));
                     departure_detail.setLatitude(Double.parseDouble(uSerBookmark.getLat()));
                     departure_detail.setAddress(uSerBookmark.getStreetAddress());
@@ -948,7 +948,7 @@ public class ClientTakeRideActivity extends Activity {
                 if (data!=null) {
                     stop_detail = new LocationAddress();
                     USerBookmark uSerBookmark = (USerBookmark) data.getSerializableExtra(Constants.BUNDLE_LOCATION);
-                    stop_address.setText(uSerBookmark.getStreetAddress());
+                    stop_address.setText(uSerBookmark.getLocation()+"("+uSerBookmark.getStreetAddress()+")");
                     stop_detail.setLongitude(Double.parseDouble(uSerBookmark.getLng()));
                     stop_detail.setLatitude(Double.parseDouble(uSerBookmark.getLat()));
                     stop_detail.setAddress(uSerBookmark.getStreetAddress());
@@ -963,7 +963,7 @@ public class ClientTakeRideActivity extends Activity {
                 if (data!=null) {
                     destination_detail = new LocationAddress();
                     USerBookmark uSerBookmark1 = (USerBookmark) data.getSerializableExtra(Constants.BUNDLE_LOCATION);
-                    destination_address.setText(uSerBookmark1.getStreetAddress());
+                    destination_address.setText(uSerBookmark1.getLocation()+"("+uSerBookmark1.getStreetAddress()+")");
                     destination_detail.setLongitude(Double.parseDouble(uSerBookmark1.getLng()));
                     destination_detail.setLatitude(Double.parseDouble(uSerBookmark1.getLat()));
                     destination_detail.setAddress(uSerBookmark1.getStreetAddress());
@@ -1022,14 +1022,15 @@ public class ClientTakeRideActivity extends Activity {
 
     private void addUserLocationToBookMark(LocationAddress location)
     {
+        String[] addressInfo = location.getLocation().split("\\(");
         USerBookmark item = new USerBookmark();
         item.setLat(""+location.getLatitude());
         item.setLng(""+location.getLongitude());
-        item.setLocation(location.getLocation());
+        item.setLocation(addressInfo[0]);
         item.setLocality(location.getLocality());
         item.setCountryName(location.getCountryName());
         item.setZipCode(location.getZipCode());
-        item.setStreetAddress(location.getAddress());
+        item.setStreetAddress(addressInfo[1].substring(0,addressInfo[1].length()-1));
 
         //新增地點到資料庫
         RealmUtil database = new RealmUtil(ClientTakeRideActivity.this);
@@ -1172,7 +1173,7 @@ public class ClientTakeRideActivity extends Activity {
 
         // set dialog message
         alertDialogBuilder
-                .setMessage(date.getText().toString()+"\t"+time.getText().toString()+"\n從:"+departure_address_info+"\n停:+"+stop_address_info+"\n到:"+destination_address_info)
+                .setMessage(date.getText().toString()+"\t"+time.getText().toString()+"\n從:"+departure_address_info+"\n停:"+stop_address_info+"\n到:"+destination_address_info)
                 .setCancelable(false)
                 .setPositiveButton(getString(R.string.cancel_take_spec), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {

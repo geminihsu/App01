@@ -52,6 +52,7 @@
 		android:layout_marginTop="20dp"
 		android:textStyle="bold"
 		android:textColor="@color/white"
+		android:visibility="gone"
 		android:background="@color/btn_bouns_record"
 		/>
 		<Button

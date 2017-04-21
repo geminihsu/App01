@@ -260,11 +260,12 @@ public class RegisterActivity extends Activity {
 
         @Override
         public void afterTextChanged(Editable s) {
-            /*if (!FormatUtils.isPhoneNumberValid(temp.toString())) {
+           // if (!FormatUtils.isPhoneNumberValid(temp.toString())) {
+            if (temp.toString().length()!=10) {
                 user_phone.setError(getString(R.string.login_error_register_msg));
                 isVerifyPhone = false;
             }else
-                isVerifyPhone = true;*/
+                isVerifyPhone = true;
         }
 
 
@@ -311,17 +312,21 @@ public class RegisterActivity extends Activity {
 
     private boolean checkColumn(){
         //check column not null
-        if (!FormatUtils.isBlankField(user_name) && !FormatUtils.isBlankField(user_id) && !FormatUtils.isBlankField(user_phone) && !FormatUtils.isBlankField(user_password) && !FormatUtils.isBlankField(user_password_confirm) )
-            {
+        boolean check = false;
+        if (!FormatUtils.isBlankField(user_name) && !FormatUtils.isBlankField(user_id) && !FormatUtils.isBlankField(user_phone) && !FormatUtils.isBlankField(user_password) && !FormatUtils.isBlankField(user_password_confirm))
+        {
             //make sure user password the same as user password confirm
             if(user_password.getText().toString().equals(user_password_confirm.getText().toString())) {
                 //check format
-                return true;
-            }else
-                return false;
-        }else
-            return false;
+                check = true;
+            }else {
+                check = false;
+            }
+        }else {
+            check =false;
+        }
 
+        return check;
     }
 
 

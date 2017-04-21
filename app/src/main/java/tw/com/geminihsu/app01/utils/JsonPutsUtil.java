@@ -979,7 +979,7 @@ public class JsonPutsUtil {
                                 String driver_uid="";
                                 if(ticketStatus.equals("ticket_order")) {
                                     content = "已有司機接單";
-                                    driver_uid =object.getString(App01libObjectKey.APP_OBJECT_KEY_UID);
+                                    driver_uid =messageInfo.optString(App01libObjectKey.APP_OBJECT_KEY_DRIVER_DRIVER_UID);
                                     Log.e(TAG,"driver_uid:"+driver_uid);
                                 }
                                 else  if(ticketStatus.equals("ticket_finish"))
@@ -998,7 +998,7 @@ public class JsonPutsUtil {
 
                                        clearPushNotification(user,Integer.valueOf(id));
 
-                                       if (mClientOrderHasBeenTakenOVerManagerCallBackFunction!=null) {
+                                       if (mClientOrderHasBeenTakenOVerManagerCallBackFunction!=null&&!driver_uid.equals("")&&Integer.valueOf(driver_uid)>0) {
                                            if(ticketStatus.equals("ticket_order"))
                                            mClientOrderHasBeenTakenOVerManagerCallBackFunction.getOrderTakenSuccess(ticketOrder, message,driver_uid);
                                            else  if(ticketStatus.equals("ticket_finish"))
@@ -1831,7 +1831,8 @@ public class JsonPutsUtil {
                         {
                             JSONObject object = jsonObject.getJSONObject(App01libObjectKey.APP_OBJECT_KEY_NOTIFICATION_INFO_MESSAGE);
                             String id = object.getString(App01libObjectKey.APP_OBJECT_KEY_NOTIFICATION_INFO_TICKET_ID);
-
+                            Log.e(TAG,"Json order id:"+id);
+                            Log.e(TAG,"orderId:"+orderId);
                             if(id.equals(orderId))
                             {
                                 //取得訂單詳細資料
@@ -2022,12 +2023,16 @@ public class JsonPutsUtil {
 
                                 RealmUtil database = new RealmUtil(mContext);
                                 if(database.queryOrder(Constants.ORDER_TICKET_ID,order.getTicket_id())==null)
+                                {
                                     database.addNormalOrder(order);
+                                    Log.e(TAG,"add order to database");
+                                }
+
 
                                 if(max) {
                                     Utility orders = new Utility(mContext);
                                     //orders.clearData(NormalOrder.class);
-                                    RealmResults<NormalOrder> data=orders.getAccountOrderListByPhoneNumber(userPhoneNumber);
+                                    RealmResults<NormalOrder> data=orders.getRecommendationOrderList();
 
                                     if (data.size() > 0) {
                                         if (mDriverRecommendationOrderListManagerCallBackFunction != null)
@@ -2945,18 +2950,47 @@ public class JsonPutsUtil {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }*/
-        try {
-            begin.put(App01libObjectKey.APP_OBJECT_KEY_ORDER_ADDRESS, order.getBegin().getAddress());
-            begin.put(App01libObjectKey.APP_OBJECT_KEY_ORDER_LAT, Double.valueOf(order.getBegin().getLatitude()));
-            begin.put(App01libObjectKey.APP_OBJECT_KEY_ORDER_LNG, Double.valueOf(order.getBegin().getLongitude()));
 
-            begin.put(App01libObjectKey.APP_OBJECT_KEY_ORDER_ZIPCODE, Integer.valueOf(order.getBegin().getZipcode()));
+        String beginZipCode="0";
+        if(order.getBegin().getZipcode()!=null)
+            beginZipCode = order.getBegin().getZipcode();
+
+        try {
+            begin.put(App01libObjectKey.APP_OBJECT_KEY_ORDER_LAT, Double.parseDouble(order.getBegin().getLatitude()));
+            begin.put(App01libObjectKey.APP_OBJECT_KEY_ORDER_LNG, Double.parseDouble(order.getBegin().getLongitude()));
+            begin.put(App01libObjectKey.APP_OBJECT_KEY_ORDER_ZIPCODE, Integer.valueOf(beginZipCode));
+            begin.put(App01libObjectKey.APP_OBJECT_KEY_ORDER_ADDRESS, order.getBegin().getAddress());
 
         } catch (JSONException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
 
+        JSONObject stop = new JSONObject();
+        /*try {
+            begin.put(App01libObjectKey.APP_OBJECT_KEY_ORDER_LAT, 24.09133);
+            begin.put(App01libObjectKey.APP_OBJECT_KEY_ORDER_LNG, 120.540315);
+            begin.put(App01libObjectKey.APP_OBJECT_KEY_ORDER_ZIPCODE, 404);
+            begin.put(App01libObjectKey.APP_OBJECT_KEY_ORDER_ADDRESS, "台中市北區市政路172號");
+
+        } catch (JSONException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }*/
+        /*String stopZipCode="0";
+        if(order.getStop().getZipcode()!=null)
+            stopZipCode = order.getStop().getZipcode();
+
+        try {
+            stop.put(App01libObjectKey.APP_OBJECT_KEY_ORDER_LAT, Double.parseDouble(order.getStop().getLatitude()));
+            stop.put(App01libObjectKey.APP_OBJECT_KEY_ORDER_LNG, Double.parseDouble(order.getStop().getLongitude()));
+            stop.put(App01libObjectKey.APP_OBJECT_KEY_ORDER_ZIPCODE, Integer.valueOf(stopZipCode));
+            stop.put(App01libObjectKey.APP_OBJECT_KEY_ORDER_ADDRESS, order.getStop_address());
+
+        } catch (JSONException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }*/
 
         JSONObject end = new JSONObject();
         /*try {
@@ -2970,44 +3004,67 @@ public class JsonPutsUtil {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }*/
-//        try {
-//            end.put(App01libObjectKey.APP_OBJECT_KEY_ORDER_ADDRESS, order.getEnd().getAddress());
-//            end.put(App01libObjectKey.APP_OBJECT_KEY_ORDER_LAT, Double.valueOf(order.getEnd().getLatitude()));
-//            end.put(App01libObjectKey.APP_OBJECT_KEY_ORDER_LNG, Double.valueOf(order.getEnd().getLongitude()));
-//            end.put(App01libObjectKey.APP_OBJECT_KEY_ORDER_ZIPCODE, Integer.valueOf(order.getEnd().getZipcode()));
-//
-//
-//        } catch (JSONException e) {
-//            // TODO Auto-generated catch block
-//            e.printStackTrace();
-//        }
+        /*String endZipCode="0";
+        if(order.getEnd().getZipcode()!=null)
+            endZipCode = order.getEnd().getZipcode();
 
-        JSONArray jsonArrayBegin = new JSONArray();
+        try {
+            end.put(App01libObjectKey.APP_OBJECT_KEY_ORDER_LAT,Double.parseDouble(order.getEnd().getLatitude()));
+            end.put(App01libObjectKey.APP_OBJECT_KEY_ORDER_LNG, Double.parseDouble(order.getEnd().getLongitude()));
+            end.put(App01libObjectKey.APP_OBJECT_KEY_ORDER_ZIPCODE, Integer.valueOf(endZipCode));
+            end.put(App01libObjectKey.APP_OBJECT_KEY_ORDER_ADDRESS, order.getEnd().getAddress());
 
-        jsonArrayBegin.put(begin);
 
-        JSONObject stop = new JSONObject();
+        } catch (JSONException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }*/
+
+        //JSONArray jsonArrayBegin = new JSONArray();
+
+        //jsonArrayBegin.put(begin);
 
         JSONArray jsonArrayStop = new JSONArray();
 
         jsonArrayStop.put(stop);
 
-        JSONArray jsonArrayEnd = new JSONArray();
 
-        jsonArrayEnd.put(end);
+        //JSONArray jsonArrayEnd = new JSONArray();
 
-
+        //jsonArrayEnd.put(end);
 
         JSONObject obj = new JSONObject();
 
         try {
+           /* obj.put(App01libObjectKey.APP_OBJECT_KEY_PUTS_METHOD, App01libObjectKey.APP_OBJECT_KEY_PUTS_METHOD_CREATE_NORMAL_ORDER);
+            obj.put(App01libObjectKey.APP_OBJECT_KEY_ORDER_USERNAME, order.getUser_name());
+            obj.put(App01libObjectKey.APP_OBJECT_KEY_ORDER_ACCESSKEY, order.getAccesskey());
+            obj.put(App01libObjectKey.APP_OBJECT_KEY_ORDER_TYPE, 4);
+            obj.put(App01libObjectKey.APP_OBJECT_KEY_ORDER_BEG, jsonArrayBegin);
+            obj.put(App01libObjectKey.APP_OBJECT_KEY_ORDER_STOP, "");
+            obj.put(App01libObjectKey.APP_OBJECT_KEY_ORDER_END, jsonArrayEnd);
+            obj.put(App01libObjectKey.APP_OBJECT_KEY_ORDER_CARGO_SIZE, 20);
+            obj.put(App01libObjectKey.APP_OBJECT_KEY_ORDER_CARGO_IMAGES, "");
+            obj.put(App01libObjectKey.APP_OBJECT_KEY_ORDER_CARGO_SPECIAL, "");
+            obj.put(App01libObjectKey.APP_OBJECT_KEY_ORDER_REMARK, "test");
+            obj.put(App01libObjectKey.APP_OBJECT_KEY_ORDER_PRICE, Integer.valueOf(order.getPrice()));
+            obj.put(App01libObjectKey.APP_OBJECT_KEY_ORDER_TIP, Integer.valueOf(order.getTip()));
+            */
             obj.put(App01libObjectKey.APP_OBJECT_KEY_PUTS_METHOD, App01libObjectKey.APP_OBJECT_KEY_PUTS_METHOD_CREATE_QUICK_TAXI_ORDER);
-            obj.put(App01libObjectKey.APP_OBJECT_KEY_QUICK_TAXI_ORDER_USERNAME, order.getUser_name());
-            obj.put(App01libObjectKey.APP_OBJECT_KEY_QUICK_TAXI_ORDER_ACCESSKEY, order.getAccesskey());
-            obj.put(App01libObjectKey.APP_OBJECT_KEY_QUICK_TAXI_ORDER_BEG, jsonArrayBegin);
-            obj.put(App01libObjectKey.APP_OBJECT_KEY_QUICK_TAXI_ORDER_STOP, jsonArrayStop);
-            obj.put(App01libObjectKey.APP_OBJECT_KEY_QUICK_TAXI_ORDER_END, jsonArrayEnd);
-
+            obj.put(App01libObjectKey.APP_OBJECT_KEY_ORDER_USERNAME, order.getUser_name());
+            obj.put(App01libObjectKey.APP_OBJECT_KEY_ORDER_ACCESSKEY, order.getAccesskey());
+            obj.put(App01libObjectKey.APP_OBJECT_KEY_ORDER_TYPE, Integer.valueOf(order.getDtype()));
+            obj.put(App01libObjectKey.APP_OBJECT_KEY_ORDER_BEG, begin);
+            obj.put(App01libObjectKey.APP_OBJECT_KEY_ORDER_STOP, jsonArrayStop);
+            obj.put(App01libObjectKey.APP_OBJECT_KEY_ORDER_END, end);
+            obj.put(App01libObjectKey.APP_OBJECT_KEY_ORDER_CARGO_TYPE, Integer.valueOf(order.getCargo_type()));
+            obj.put(App01libObjectKey.APP_OBJECT_KEY_ORDER_CARGO_SIZE, 0);
+            obj.put(App01libObjectKey.APP_OBJECT_KEY_ORDER_CARGO_IMAGES, "");
+            obj.put(App01libObjectKey.APP_OBJECT_KEY_ORDER_CARGO_SPECIAL, order.getCar_special());
+            obj.put(App01libObjectKey.APP_OBJECT_KEY_ORDER_TIME_BEGIN, Long.parseLong(order.getTimebegin()));
+            obj.put(App01libObjectKey.APP_OBJECT_KEY_ORDER_REMARK, order.getRemark());
+            obj.put(App01libObjectKey.APP_OBJECT_KEY_ORDER_PRICE, Integer.valueOf(order.getPrice()));
+            obj.put(App01libObjectKey.APP_OBJECT_KEY_ORDER_TIP, Integer.valueOf(order.getTip()));
 
 
         } catch (JSONException e) {

@@ -44,6 +44,7 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -233,7 +234,7 @@ public class OrderMapActivity extends Activity implements  LocationListener, Goo
         send.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(longitude!=0)
+                if(longitude!=0||getLocation)
                     returnAddress();
             }
 
@@ -301,6 +302,13 @@ public class OrderMapActivity extends Activity implements  LocationListener, Goo
             unregisterReceiver(getCurrentGPSLocationBroadcastReceiver);
             getCurrentGPSLocationBroadcastReceiver=null;
         }*/
+        if (mMapView != null) {
+            try {
+                mMapView.onDestroy();
+            } catch (NullPointerException e) {
+                // Log.e(TAG, "Error while attempting MapView.onDestroy(), ignoring exception", e);
+            }
+        }
         if(longitude!=0)
         {
             Intent i = new Intent();
@@ -389,8 +397,11 @@ public class OrderMapActivity extends Activity implements  LocationListener, Goo
             LatLngBounds.Builder builder = new LatLngBounds.Builder();
             builder.include(new LatLng(latitude, longitude));
 
-            googleMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-            googleMap.animateCamera(CameraUpdateFactory.zoomTo(17));
+            LatLng coordinate = new LatLng(latitude, longitude); //Store these lat lng values somewhere. These should be constant.
+            CameraUpdate location = CameraUpdateFactory.newLatLngZoom(
+                    coordinate, 17);
+            //googleMap.moveCamera(location);
+            googleMap.animateCamera(location);
 
         }
     }
@@ -454,6 +465,8 @@ public class OrderMapActivity extends Activity implements  LocationListener, Goo
         b.putBoolean(ClientTakeRideActivity.BUNDLE_KEEP_BOOMARK,bookmark.isChecked());
         b.putString(Constants.BUNDLE_MAP_LATITUDE, "" + latitude);
         b.putString(Constants.BUNDLE_MAP_LONGITUDE, "" + longitude);
+        if(getLocation)
+            b.putString(Constants.BUNDLE_MAP_CURRENT_ADDRESS,curAddress);
         i.putExtras(b);
         if (provide_location == Constants.DEPARTURE_QUERY_GPS)
             setResult(Constants.DEPARTURE_QUERY_GPS, i);
@@ -524,10 +537,12 @@ public class OrderMapActivity extends Activity implements  LocationListener, Goo
                     DateFormat.getTimeInstance().format(location.getTime()) + "\n" +
                             "Latitude=" + location.getLatitude() + "\n" +
                             "Longitude=" + location.getLongitude();
-            Log.e("TAG",strLocation);
+            Log.e("TAG","find current:"+strLocation);
             if(getLocation) {
                 setMapView(location.getLongitude(), location.getLatitude());
                 getLocation = false;
+                latitude = location.getLatitude();
+                longitude = location.getLongitude();
                 getCurrentAddress(location.getLongitude(),location.getLatitude());
             }
         }

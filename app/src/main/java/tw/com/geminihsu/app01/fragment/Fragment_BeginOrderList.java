@@ -326,7 +326,7 @@ public class Fragment_BeginOrderList extends Fragment implements
             progressDialog_loading = ProgressDialog.show(getActivity(), "",
                     "Loading. Please wait...", true);
         }
-        loadOrderList.setRefreshing(true);
+        //loadOrderList.setRefreshing(true);
 
 
         //sendDataRequest.queryRecommendOrderList(info.getAccountInfo());

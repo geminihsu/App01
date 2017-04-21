@@ -111,6 +111,14 @@ public class Utility {
 
         return drivers;
     }
+
+    public RealmResults<NormalOrder> getRecommendationOrderList() {
+        RealmUtil data = new RealmUtil(mContext);
+        RealmResults<NormalOrder> orders = data.queryAllOrderList();
+
+        return  orders;
+    }
+
     public RealmResults<NormalOrder> getAccountOrderList() {
         SharedPreferences configSharedPreferences = PreferenceManager.getDefaultSharedPreferences(mContext);
 

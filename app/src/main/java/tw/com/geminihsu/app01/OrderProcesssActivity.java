@@ -329,14 +329,9 @@ public class OrderProcesssActivity extends Activity implements LocationListener 
 
             @Override
             public void onClick(View v) {
-                /*Intent question = new Intent(OrderProcesssActivity.this, MapsNavigationActivity.class);
-                Bundle b = new Bundle();
-                b.putString(Constants.ARG_POSITION, order.getBegin_address());
-                question.putExtras(b);
-                startActivity(question);*/
 
                 Intent intent = new Intent(android.content.Intent.ACTION_VIEW,
-                        Uri.parse("http://maps.google.com/maps?saddr="+location_address+"&daddr="+order.getBegin_address()));
+                        Uri.parse("http://maps.google.com/maps?daddr="+order.getBegin_address()));
                 startActivity(intent);
             }
         });
@@ -345,7 +340,7 @@ public class OrderProcesssActivity extends Activity implements LocationListener 
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(android.content.Intent.ACTION_VIEW,
-                        Uri.parse("http://maps.google.com/maps?saddr="+location_address+"&daddr="+order.getEnd_address()));
+                        Uri.parse("http://maps.google.com/maps?daddr="+order.getEnd_address()));
                 startActivity(intent);
             }
         });

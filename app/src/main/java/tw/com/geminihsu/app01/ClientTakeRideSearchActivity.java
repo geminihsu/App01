@@ -329,12 +329,12 @@ public class ClientTakeRideSearchActivity extends Activity {
             Intent question = new Intent(ClientTakeRideSearchActivity.this, MenuMainActivity.class);
             question.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(question);
-        }else
+        }/*else
         {
             //cancel order
 
             sendDataRequest.clientCancelOrder(order,null);
-        }
+        }*/
 
     }
 

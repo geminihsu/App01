@@ -58,6 +58,7 @@ import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.IOException;
@@ -122,6 +123,9 @@ public class Fragment_Client_Service_test extends Fragment  implements LocationL
 
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
+
+    private Marker myMarker;
+
     private boolean getLocation = true;
 
     static final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
@@ -130,6 +134,7 @@ public class Fragment_Client_Service_test extends Fragment  implements LocationL
     private Timer timer;
 
     private LocationAddress result;
+    private boolean isVerify;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -167,6 +172,7 @@ public class Fragment_Client_Service_test extends Fragment  implements LocationL
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .addApi(LocationServices.API)
+
                 .build();
         this.findViews();
         setLister();
@@ -176,6 +182,7 @@ public class Fragment_Client_Service_test extends Fragment  implements LocationL
                 @Override
                 public void run() {
                     getLocation = true;
+
                 }
             };
 
@@ -204,7 +211,7 @@ public class Fragment_Client_Service_test extends Fragment  implements LocationL
             LatLng latLng = new LatLng(latitude, longitude);
 
             //Adding marker to map
-            googleMap.addMarker(new MarkerOptions()
+            myMarker = googleMap.addMarker(new MarkerOptions()
                     .position(latLng) //setting position
                     .draggable(true) //Making the marker draggable
                     .title("Current Location")); //Adding a title
@@ -239,6 +246,20 @@ public class Fragment_Client_Service_test extends Fragment  implements LocationL
             mapView.onResume();
         }
 
+        if (isVerify) {
+            if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                return;
+            }
+            LocationServices.FusedLocationApi.requestLocationUpdates(
+                    mGoogleApiClient, mLocationRequest, this);
+        }
 
     }
 
@@ -612,7 +633,7 @@ public class Fragment_Client_Service_test extends Fragment  implements LocationL
         item.setTitle(spanString);
         Utility driver = new Utility(getActivity());
 
-        if(isShowOneKey&&driver.getAllDriverAccountInfo().isEmpty())
+        if(isShowOneKey&&driver.getAccountInfo().getRole()==0)
             item.setVisible(true);
         else
             item.setVisible(false);
@@ -685,6 +706,7 @@ public class Fragment_Client_Service_test extends Fragment  implements LocationL
                 && ActivityCompat.checkSelfPermission(getActivity(),
                 Manifest.permission.ACCESS_COARSE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
+            isVerify = true;
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
             // here to request the missing permissions, and then overriding
@@ -723,6 +745,7 @@ public class Fragment_Client_Service_test extends Fragment  implements LocationL
                             "Longitude=" + location.getLongitude();
             Log.e("TAG",strLocation);
             if(getLocation) {
+                myMarker.remove();
                 setMapView(location.getLongitude(), location.getLatitude());
                 getLocation = false;
                 getCurrentAddress(location.getLongitude(),location.getLatitude());

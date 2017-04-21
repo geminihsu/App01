@@ -162,6 +162,7 @@ public class App01libObjectKey {
     public static final String APP_OBJECT_KEY_UPLOAD_FILE_URL = "file_url";
     public static final String APP_OBJECT_KEY_DRIVER_DID = "did";
     public static final String APP_OBJECT_KEY_DRIVER_DRIVER_DID = "driver_did";
+    public static final String APP_OBJECT_KEY_DRIVER_DRIVER_UID = "driver_uid";
     public static final String APP_OBJECT_KEY_DRIVER_DRIVER = "driver";
     public static final String APP_OBJECT_KEY_DRIVER_TICKET_ID = "ticket_id";
     public static final String APP_OBJECT_KEY_SEND_NOTIFICATION_MESSAGE = "message";
