@@ -7,6 +7,10 @@
             android:checked="true"
             android:icon="@drawable/ic_launcher"
             android:title="@string/begin_order"/>
+        <item
+            android:id="@+id/navigation_item_order_record"
+            android:icon="@drawable/ic_launcher"
+            android:title="@string/order_record"/>
         <!-- for Driver application!-->
         <item
             android:id="@+id/navigation_item_order_filter"
@@ -31,10 +35,6 @@
             android:icon="@drawable/ic_launcher"
             android:title="@string/order"/>
         <!-- for Customer application!-->
-        <item
-            android:id="@+id/navigation_item_order_record"
-            android:icon="@drawable/ic_launcher"
-            android:title="@string/order_record"/>
         <item
             android:id="@+id/navigation_item_support"
             android:checked="true"

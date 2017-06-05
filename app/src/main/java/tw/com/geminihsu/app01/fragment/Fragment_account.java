@@ -237,10 +237,10 @@ public class Fragment_Account extends Fragment {
         btn_apply_driver = (Button) getView().findViewById(R.id.apply_driver);
         btn_driver_identity = (Button) getView().findViewById(R.id.driver_identity);
 
-        Utility account = new Utility(getActivity());
-        driver = account.getDriverAccountInfo();
-        if(driver==null)
-            btn_driver_identity.setVisibility(View.GONE);
+        //Utility account = new Utility(getActivity());
+        //driver = account.getDriverAccountInfo();
+        //if(driver==null)
+        btn_driver_identity.setVisibility(View.GONE);
     }
 
     private void setLister(){

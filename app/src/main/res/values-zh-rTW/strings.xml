@@ -63,7 +63,7 @@
     <string name="driver_idenity_page_title">選擇身份</string>
     <string name="driver_login_page_title">司機登入</string>
     <!-- login page -->
-    <string name="app_name">App01</string>
+    <string name="app_name">App01_client</string>
     <string name="app_database_name">App01.realm</string>
     <string name="portal_login">Log In</string>
     <string name="portal_clean">Sign Out</string>

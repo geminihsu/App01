@@ -243,6 +243,13 @@ public class App01libObjectKey {
     public static final String APP_OBJECT_KEY_SEND_CUSTOMER_FEEDBACK_CONTENT = "content";
 
 
+    //get customer tree watering
+    public static final String APP_OBJECT_KEY_CLIENT_TREE_WATERING = "m_tree_watering";
+
+
+    //gain bound
+    public static final String APP_OBJECT_KEY_CLIENT_GAIN_BOUND = "m_tree_crop";
+
 
     public enum APP_REGISTER_RESPONSE_CODE
     {
@@ -558,6 +565,49 @@ public class App01libObjectKey {
         private int value;
 
         private APP_DRIVER_QUERY_ORDER_LIST(int value) {
+            this.value = value;
+        }
+
+        public int value() {
+            return value;
+        }
+    };
+
+    public enum APP_CUSTOMER_ADD_TREE_WATERING
+    {
+        K_APP_CUSTOMER_ADD_TREE_WATERING_SUCCESS (100),
+        K_APP_CUSTOMER_ADD_TREE_WATERING_EXPIRED (708),
+        K_APP_CUSTOMER_ADD_TREE_WATERING_GROWN (842),
+        K_APP_CUSTOMER_ADD_TREE_WATERING_SMS_VERIFY(704),
+        K_APP_CUSTOMER_ADD_TREE_WATERING_NO_EXSIT (701),
+        K_APP_CUSTOMER_ADD_TREE_WATERING_ERROR (401),
+        K_APP_CUSTOMER_ADD_HAS_BEEN_TREE_WATERING(841);
+
+        private int value;
+
+        private APP_CUSTOMER_ADD_TREE_WATERING(int value) {
+            this.value = value;
+        }
+
+        public int value() {
+            return value;
+        }
+    };
+
+    public enum APP_CUSTOMER_TAKE_BOUNS
+    {
+        K_APP_CUSTOMER_TAKE_BOUNS_SUCCESS (100),
+        K_APP_CUSTOMER_TAKE_BOUNS_EXPIRED (708),
+        K_APP_CUSTOMER_TAKE_BOUNS_NO_GROWN (843),
+        K_APP_CUSTOMER_TAKE_BOUNS_SMS_VERIFY(704),
+        K_APP_CUSTOMER_TAKE_BOUNS_NO_EXSIT (701),
+        K_APP_CUSTOMER_TAKE_BOUNS_ERROR (900),
+        K_APP_CUSTOMER_TAKE_BOUNS_DATABASE_ERROR (401),
+        K_APP_CUSTOMER_TAKE_BOUNS_WAIT_TOMORROW(844);
+
+        private int value;
+
+        private APP_CUSTOMER_TAKE_BOUNS(int value) {
             this.value = value;
         }
 
@@ -997,4 +1047,68 @@ public class App01libObjectKey {
         }
         return null;
     }
+
+    public static APP_CUSTOMER_ADD_TREE_WATERING conversion_customer_add_watering_result(int index) {
+        if (index >= 0) {
+            if (index == 100) {
+                return APP_CUSTOMER_ADD_TREE_WATERING.K_APP_CUSTOMER_ADD_TREE_WATERING_SUCCESS;
+            }
+
+            if (index == 708) {
+                return APP_CUSTOMER_ADD_TREE_WATERING.K_APP_CUSTOMER_ADD_TREE_WATERING_EXPIRED;
+            }
+            if (index == 842) {
+                return APP_CUSTOMER_ADD_TREE_WATERING.K_APP_CUSTOMER_ADD_TREE_WATERING_GROWN;
+            }
+            if (index == 704) {
+                return APP_CUSTOMER_ADD_TREE_WATERING.K_APP_CUSTOMER_ADD_TREE_WATERING_SMS_VERIFY;
+            }
+
+            if (index == 701) {
+                return APP_CUSTOMER_ADD_TREE_WATERING.K_APP_CUSTOMER_ADD_TREE_WATERING_NO_EXSIT;
+            }
+            if (index == 401) {
+                return APP_CUSTOMER_ADD_TREE_WATERING.K_APP_CUSTOMER_ADD_TREE_WATERING_ERROR;
+            }
+            if (index == 841) {
+                return APP_CUSTOMER_ADD_TREE_WATERING.K_APP_CUSTOMER_ADD_HAS_BEEN_TREE_WATERING;
+            }
+        }
+        return null;
+    }
+
+
+    public static APP_CUSTOMER_TAKE_BOUNS conversion_customer_take_bouns_result(int index) {
+        if (index >= 0) {
+            if (index == 100) {
+                return APP_CUSTOMER_TAKE_BOUNS.K_APP_CUSTOMER_TAKE_BOUNS_SUCCESS;
+            }
+
+            if (index == 708) {
+                return APP_CUSTOMER_TAKE_BOUNS.K_APP_CUSTOMER_TAKE_BOUNS_EXPIRED;
+            }
+            if (index == 843) {
+                return APP_CUSTOMER_TAKE_BOUNS.K_APP_CUSTOMER_TAKE_BOUNS_NO_GROWN;
+            }
+            if (index == 704) {
+                return APP_CUSTOMER_TAKE_BOUNS.K_APP_CUSTOMER_TAKE_BOUNS_SMS_VERIFY;
+            }
+
+            if (index == 701) {
+                return APP_CUSTOMER_TAKE_BOUNS.K_APP_CUSTOMER_TAKE_BOUNS_NO_EXSIT;
+            }
+            if (index == 900) {
+                return APP_CUSTOMER_TAKE_BOUNS.K_APP_CUSTOMER_TAKE_BOUNS_ERROR;
+            }
+            if (index == 401) {
+                return APP_CUSTOMER_TAKE_BOUNS.K_APP_CUSTOMER_TAKE_BOUNS_DATABASE_ERROR;
+            }
+
+            if (index == 844) {
+                return APP_CUSTOMER_TAKE_BOUNS.K_APP_CUSTOMER_TAKE_BOUNS_WAIT_TOMORROW;
+            }
+        }
+        return null;
+    }
+
 }

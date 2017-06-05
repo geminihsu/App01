@@ -20,6 +20,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,17 +33,30 @@ import java.util.ArrayList;
 import java.util.List;
 
 import tw.com.geminihsu.app01.BoundsRecordActivity;
+import tw.com.geminihsu.app01.OrderProcesssActivity;
 import tw.com.geminihsu.app01.R;
 import tw.com.geminihsu.app01.adapter.PrizeListItem;
 import tw.com.geminihsu.app01.adapter.PrizeListItemAdapter;
+import tw.com.geminihsu.app01.bean.AccountInfo;
+import tw.com.geminihsu.app01.bean.AccountTreeInfo;
+import tw.com.geminihsu.app01.bean.NormalOrder;
 import tw.com.geminihsu.app01.common.Constants;
+import tw.com.geminihsu.app01.utils.JsonPutsUtil;
+import tw.com.geminihsu.app01.utils.RealmUtil;
+import tw.com.geminihsu.app01.utils.ThreadPoolUtil;
+import tw.com.geminihsu.app01.utils.Utility;
 
 
 public class Fragment_Bouns extends Fragment {
+    private final String TAG = Fragment_Bouns.class.toString();
+
     private ListView listView;
     private final List<PrizeListItem> mPrizeListData = new ArrayList<PrizeListItem>();;
     private PrizeListItemAdapter listViewAdapter;
     private Button record;
+    private Button upgrade;
+    private AccountTreeInfo treeInfo = null;
+    private JsonPutsUtil sendDataRequest;
 
     private int MAXSIZE=10;
     @Override
@@ -66,6 +80,22 @@ public class Fragment_Bouns extends Fragment {
 
         this.findViews();
         this.setListView();
+        Utility info = new Utility(getActivity());
+        RealmUtil data = new RealmUtil(getActivity());
+        treeInfo  = data.queryUserTreeInfo(Constants.ACCOUNT_USER_ID,info.getAccountInfo().getId());
+        sendDataRequest = new JsonPutsUtil(getActivity());
+
+        sendDataRequest.setCustomerTreeWateringFeedBackManagerCallBackFunction(new JsonPutsUtil.CustomerTreeWateringCallBackFunction() {
+
+
+            @Override
+            public void sendStatus(boolean status) {
+
+            }
+        });
+
+        if(treeInfo.getLv() <1)
+            listView.setVisibility(View.GONE);
         getDataFromDB();
         // 建立ListItemAdapter
         listViewAdapter = new PrizeListItemAdapter(getActivity(), 0, mPrizeListData);
@@ -93,6 +123,7 @@ public class Fragment_Bouns extends Fragment {
     {
         listView = (ListView) getView().findViewById(R.id.listView1);
         record = (Button) getView().findViewById(R.id.bouns_record);
+        upgrade = (Button) getView().findViewById(R.id.bouns_upgrade);
 
     }
 
@@ -110,6 +141,9 @@ public class Fragment_Bouns extends Fragment {
                     @Override
                     public void onClick(View v) {
 
+                        Utility info = new Utility(getActivity());
+                        sendDataRequest.sendCustomerGainBound(info.getAccountInfo());
+
                     }
                 });
 
@@ -122,6 +156,21 @@ public class Fragment_Bouns extends Fragment {
             public void onClick(View v) {
                 Intent question = new Intent(getActivity(), BoundsRecordActivity.class);
                 startActivity(question);
+            }
+        });
+
+        upgrade.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                ThreadPoolUtil.getThreadPoolExecutor().execute((new Runnable(){
+                    @Override
+                    public void run() {
+                        Utility info = new Utility(getActivity());
+                        sendDataRequest.sendCustomerTreeWatering(info.getAccountInfo());
+                    }
+                }));
+
             }
         });
     }
@@ -141,24 +190,27 @@ public class Fragment_Bouns extends Fragment {
     private void getDataFromDB() {
 
         mPrizeListData.clear();
-        try {
-            // GeoDeviceManagement.deviceList = new ArrayList<UpnpSearchResultBean>();
-            // GeoDeviceManagement.deviceList.clear();
-            for (int i = 0; i < MAXSIZE; i++) {
-                // for listview 要用的資料
-                Bitmap bm1 = BitmapFactory.decodeResource(getResources(), R.drawable.ic_camera_72x72);
-                //Bitmap bm2 = BitmapFactory.decodeResource(getResources(), R.drawable.ic_online);
-                PrizeListItem item = new PrizeListItem();
-                item.prize_title="50嵐珍珠奶茶兌換卷";
-                item.take="領取";
-                mPrizeListData.add(item);
+
+            try {
+                // GeoDeviceManagement.deviceList = new ArrayList<UpnpSearchResultBean>();
+                // GeoDeviceManagement.deviceList.clear();
+                for (int i = 0; i < 1; i++) {
+                    // for listview 要用的資料
+                    Bitmap bm1 = BitmapFactory.decodeResource(getResources(), R.drawable.ic_camera_72x72);
+                    //Bitmap bm2 = BitmapFactory.decodeResource(getResources(), R.drawable.ic_online);
+                    PrizeListItem item = new PrizeListItem();
+                    if(treeInfo.getLv() == 1)
+                        item.prize_title = "積分200點";
+                    item.take = "領取";
+                    mPrizeListData.add(item);
 
 
+                }
+
+            } catch (Throwable t) {
+                Toast.makeText(getActivity(), "Exception: " + t.toString(), Toast.LENGTH_SHORT).show();
             }
 
-        } catch (Throwable t) {
-            Toast.makeText(getActivity(), "Exception: " + t.toString(), Toast.LENGTH_SHORT).show();
-        }
     }
 
 

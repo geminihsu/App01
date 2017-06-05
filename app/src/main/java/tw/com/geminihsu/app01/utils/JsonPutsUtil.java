@@ -1,10 +1,8 @@
 package tw.com.geminihsu.app01.utils;
 
-import android.app.AlertDialog;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -14,7 +12,6 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.annotation.IntegerRes;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.ImageView;
@@ -36,7 +33,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.net.HttpURLConnection;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -47,18 +43,13 @@ import java.util.Map;
 
 import io.realm.RealmResults;
 import tw.com.geminihsu.app01.BuildConfig;
-import tw.com.geminihsu.app01.DriverAccountActivity;
 import tw.com.geminihsu.app01.DriverCommentActivity;
-import tw.com.geminihsu.app01.MainActivity;
 import tw.com.geminihsu.app01.R;
-import tw.com.geminihsu.app01.RegisterActivity;
-import tw.com.geminihsu.app01.VerifyCodeActivity;
 import tw.com.geminihsu.app01.bean.AccountInfo;
 import tw.com.geminihsu.app01.bean.AccountTreeInfo;
 import tw.com.geminihsu.app01.bean.App01libObjectKey;
 import tw.com.geminihsu.app01.bean.DriverIdentifyInfo;
 import tw.com.geminihsu.app01.bean.ImageBean;
-import tw.com.geminihsu.app01.bean.LocationAddress;
 import tw.com.geminihsu.app01.bean.NormalOrder;
 import tw.com.geminihsu.app01.bean.OrderLocationBean;
 import tw.com.geminihsu.app01.fragment.Fragment_BeginOrderList;
@@ -612,6 +603,7 @@ public class JsonPutsUtil {
 
     }
 
+
     public void getUserInfo(final AccountInfo user, final boolean isCheckInfo) {
 
         //final RequestQueue requestQueue = Volley.newRequestQueue(mContext);
@@ -733,7 +725,7 @@ public class JsonPutsUtil {
                             treeInfo.setUser_uid(""+user.getId());
                             treeInfo.setUser_did(did);
                             treeInfo.setAccesskey(user.getAccessKey());
-                            treeInfo.setUser_name(user.getName());
+                            treeInfo.setUser_name(user.getPhoneNumber());
                             treeInfo.setLv(tree_lv);
                             treeInfo.setLast_watering(tree_last_watering);
                             treeInfo.setNext(tree_next);
@@ -749,6 +741,7 @@ public class JsonPutsUtil {
                                     database.addDriverInfo(driverIdentifyInfo);
                                 }
                                 database.addAccount(user);
+                                database.addUserTreeInfo(treeInfo);
                                 //設定檔顯示登入的帳號密碼
                                 SharedPreferences configSharedPreferences = PreferenceManager.getDefaultSharedPreferences(mContext);
 
@@ -3971,6 +3964,150 @@ public class JsonPutsUtil {
         VolleySingleton.getInstance(mContext).addToRequestQueue(jsonObjectRequest);
 
     }
+
+    public void sendCustomerTreeWatering(AccountInfo info)
+    {
+
+        //final RequestQueue requestQueue = Volley.newRequestQueue(mContext);
+
+
+        JSONObject obj = new JSONObject();
+
+        try {
+            obj.put(App01libObjectKey.APP_OBJECT_KEY_PUTS_METHOD, App01libObjectKey.APP_OBJECT_KEY_CLIENT_TREE_WATERING);
+            obj.put(App01libObjectKey.APP_OBJECT_KEY_DRIVER_USERNAME, info.getPhoneNumber());
+            obj.put(App01libObjectKey.APP_OBJECT_KEY_DRIVER_ACCESSKEY, info.getAccessKey());
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        final JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST,Constants.SERVER_URL,obj,new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject jsonObject) {
+                Log.e(TAG,"[sendGetServerContentDetail]:"+jsonObject.toString());
+
+                try {
+                    // Parsing json object response
+                    // response will be a json object
+                    String status = jsonObject.getString(App01libObjectKey.APP_OBJECT_KEY_ACCOUNT_INFO_STATUS);
+
+                    App01libObjectKey.APP_CUSTOMER_ADD_TREE_WATERING connectResult =App01libObjectKey.conversion_customer_add_watering_result(Integer.valueOf(status));
+
+                    if(connectResult.equals(App01libObjectKey.APP_CUSTOMER_ADD_TREE_WATERING.K_APP_CUSTOMER_ADD_TREE_WATERING_SUCCESS))
+                    {
+                        if (mCustomerAddWateringCallBackFunction!=null)
+                            mCustomerAddWateringCallBackFunction.sendStatus(true);
+
+                    }else
+                    {
+                        String message = jsonObject.getString(App01libObjectKey.APP_OBJECT_KEY_DEVICE_INFO_MESSAGE);
+
+                        Toast.makeText(mContext,
+                                message,
+                                Toast.LENGTH_LONG).show();
+                        if (mCustomerAddWateringCallBackFunction!=null)
+                            mCustomerAddWateringCallBackFunction.sendStatus(false);
+
+                    }
+
+                } catch (JSONException e) {
+                    //NewRelic.noticeNetworkFailure(Constants.SERVER_URL, "Puts",System.nanoTime(), System.nanoTime(),e);
+
+                    e.printStackTrace();
+                    Toast.makeText(mContext,
+                            "Error: " + e.getMessage(),
+                            Toast.LENGTH_LONG).show();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+                Exception e =  new Exception();
+                e.setStackTrace(volleyError.getStackTrace());
+                //NewRelic.noticeNetworkFailure(Constants.SERVER_URL, "Puts",System.nanoTime(), System.nanoTime(),e);
+
+                if(volleyError.getMessage()!=null)
+                    Log.e(TAG,volleyError.getMessage().toString());
+            }
+        });
+        //requestQueue.add(jsonObjectRequest);
+        // Adding request to request queue
+        //AppController.getInstance().addToRequestQueue(jsonObjectRequest);
+        VolleySingleton.getInstance(mContext).addToRequestQueue(jsonObjectRequest);
+
+    }
+
+    public void sendCustomerGainBound(AccountInfo info)
+    {
+
+        //final RequestQueue requestQueue = Volley.newRequestQueue(mContext);
+
+
+        JSONObject obj = new JSONObject();
+
+        try {
+            obj.put(App01libObjectKey.APP_OBJECT_KEY_PUTS_METHOD, App01libObjectKey.APP_OBJECT_KEY_CLIENT_GAIN_BOUND);
+            obj.put(App01libObjectKey.APP_OBJECT_KEY_DRIVER_USERNAME, info.getPhoneNumber());
+            obj.put(App01libObjectKey.APP_OBJECT_KEY_DRIVER_ACCESSKEY, info.getAccessKey());
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        final JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST,Constants.SERVER_URL,obj,new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject jsonObject) {
+                Log.e(TAG,"[sendGetServerContentDetail]:"+jsonObject.toString());
+
+                try {
+                    // Parsing json object response
+                    // response will be a json object
+                    String status = jsonObject.getString(App01libObjectKey.APP_OBJECT_KEY_ACCOUNT_INFO_STATUS);
+
+                    App01libObjectKey.APP_CUSTOMER_TAKE_BOUNS connectResult =App01libObjectKey.conversion_customer_take_bouns_result(Integer.valueOf(status));
+
+                    if(connectResult.equals(App01libObjectKey.APP_CUSTOMER_TAKE_BOUNS.K_APP_CUSTOMER_TAKE_BOUNS_SUCCESS))
+                    {
+                        if (mCustomerAddWateringCallBackFunction!=null)
+                            mCustomerAddWateringCallBackFunction.sendStatus(true);
+
+                    }else
+                    {
+                        String message = jsonObject.getString(App01libObjectKey.APP_OBJECT_KEY_DEVICE_INFO_MESSAGE);
+
+                        Toast.makeText(mContext,
+                                message,
+                                Toast.LENGTH_LONG).show();
+                        if (mCustomerAddWateringCallBackFunction!=null)
+                            mCustomerAddWateringCallBackFunction.sendStatus(false);
+
+                    }
+
+                } catch (JSONException e) {
+                    //NewRelic.noticeNetworkFailure(Constants.SERVER_URL, "Puts",System.nanoTime(), System.nanoTime(),e);
+
+                    e.printStackTrace();
+                    Toast.makeText(mContext,
+                            "Error: " + e.getMessage(),
+                            Toast.LENGTH_LONG).show();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+                Exception e =  new Exception();
+                e.setStackTrace(volleyError.getStackTrace());
+                //NewRelic.noticeNetworkFailure(Constants.SERVER_URL, "Puts",System.nanoTime(), System.nanoTime(),e);
+
+                if(volleyError.getMessage()!=null)
+                    Log.e(TAG,volleyError.getMessage().toString());
+            }
+        });
+        //requestQueue.add(jsonObjectRequest);
+        // Adding request to request queue
+        //AppController.getInstance().addToRequestQueue(jsonObjectRequest);
+        VolleySingleton.getInstance(mContext).addToRequestQueue(jsonObjectRequest);
+
+    }
     //new method for appending the crossProcessID necessary for CAT in New Relic
     /*public static void setCrossProcessHeader(HttpURLConnection conn) {
         String crossProcessId = Agent.getCrossProcessId(); // API call into the agent for the X-NewRelic-ID
@@ -4215,6 +4352,21 @@ public class JsonPutsUtil {
         public void sendStatus(boolean status);
 
     }
+
+
+    //使用者澆水
+    private CustomerTreeWateringCallBackFunction mCustomerAddWateringCallBackFunction;
+
+    public void setCustomerTreeWateringFeedBackManagerCallBackFunction(CustomerTreeWateringCallBackFunction customerTreeWateringCallBackFunctionCallBackFunction) {
+        mCustomerAddWateringCallBackFunction = customerTreeWateringCallBackFunctionCallBackFunction;
+
+    }
+
+    public interface CustomerTreeWateringCallBackFunction {
+        public void sendStatus(boolean status);
+
+    }
+
 
     private void getStreetBookMarkAddress(ArrayList<ServerBookmark> bookmarks,RealmUtil database)
     {

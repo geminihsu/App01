@@ -119,13 +119,13 @@ public class MenuMainActivity extends AppCompatActivity implements Fragment_Begi
             Log.e(TAG, "download file");
         }
         // 判斷要用哪一個Delegate
-        if(info.getDriverAccountInfo()!=null) {
+        //if(info.getDriverAccountInfo()!=null) {
 
-            viewDelegateBase = new MenuMainViewDelegateDriver(this);
-        } else {
+        //    viewDelegateBase = new MenuMainViewDelegateDriver(this);
+        //} else {
 
             viewDelegateBase = new MenuMainViewDelegateCustomer(this);
-        }
+        //}
 
          // 加入主頁面fragment
         viewDelegateBase.setContentLayoutFragment();

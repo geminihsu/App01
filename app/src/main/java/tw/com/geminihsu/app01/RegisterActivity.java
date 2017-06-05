@@ -60,12 +60,12 @@ public class RegisterActivity extends Activity {
 
     private Button verify;
     private CheckBox agree;
-    private boolean debug = false;
+    private boolean debug = true;
 
     private JsonPutsUtil sendDataRequest;
     private ProgressDialog dialog;
 
-    private boolean debug_test =false;
+    private boolean debug_test =true;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

@@ -83,11 +83,12 @@ public class MenuMainViewDelegateCustomer extends MenuMainViewDelegateBase {
 		super.setNavigationItem(menu);
 		//更改為司機和乘客都顯示同樣的選單
 		menu.findItem(R.id.navigation_item_order).setVisible(true);
+		menu.findItem(R.id.navigation_item_order_record).setVisible(true);
 		menu.findItem(R.id.navigation_item_wait).setVisible(false);
 		menu.findItem(R.id.navigation_item_begin).setVisible(false);
 
-		menu.findItem(R.id.navigation_item_order).setVisible(true);
-		//menu.findItem(R.id.navigation_item_order_record).setVisible(true);
+
+		menu.findItem(R.id.navigation_item_wallet).setVisible(true);
 		menu.findItem(R.id.navigation_item_logOut).setVisible(true);
 
 	}

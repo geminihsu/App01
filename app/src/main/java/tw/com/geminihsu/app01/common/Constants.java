@@ -50,6 +50,9 @@ public class Constants {
 
 	public final static String ACCOUNT_NAME = "name";// from
 
+
+	public final static String ACCOUNT_USER_ID = "user_id";// from
+
 	public final static String ACCOUNT_DRIVER_UID = "uid";// from
 
 	public final static String ORDER_TICKET_ID = "ticket_id";// from

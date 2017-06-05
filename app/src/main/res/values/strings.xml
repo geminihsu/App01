@@ -7,32 +7,32 @@
     <string name="config_login_password_key">key_login_default_password</string>
 
     <!-- Page Title -->
-    <string name="login_page_title">登入帳號</string>
-    <string name="forget_page_title">忘記密碼</string>
-    <string name="register_page_title">會員註冊</string>
-    <string name="about_page_title">關於第一幫</string>
+    <string name="login_page_title">Login Account</string>
+    <string name="forget_page_title">Forget Password</string>
+    <string name="register_page_title">Register</string>
+    <string name="about_page_title">About App01</string>
     <string name="order_record_filter_page_title">訂單篩選</string>
     <string name="order_record_page_title">訂單紀錄</string>
-    <string name="support_page_title">客戶支援</string>
-    <string name="question_page_title">常見問題</string>
-    <string name="clause_page_title">會員條款</string>
-    <string name="suggestion_page_title">提供建議</string>
-    <string name="myaccount_page_title">我的帳戶</string>
+    <string name="support_page_title">Support</string>
+    <string name="question_page_title">Questions</string>
+    <string name="clause_page_title">Terms</string>
+    <string name="suggestion_page_title">Suggestion</string>
+    <string name="myaccount_page_title">Account</string>
     <string name="change_password_page_title">修改密碼</string>
     <string name="commmet_page_title">獲得評語</string>
     <string name="recommend_page_title">我推薦的好友</string>
-    <string name="prize_record_page_title">積分紀錄</string>
+    <string name="prize_record_page_title">Points Record</string>
     <string name="photo_verify_page_title">上傳證件</string>
     <string name="driver_account_page_title">編輯司機資料</string>
     <string name="order_filter_page_title">訂單篩選</string>
-    <string name="order_call_taxi_page_title">一鍵叫車</string>
-    <string name="begin_order_page_title">開始接單</string>
+    <string name="order_call_taxi_page_title">Call Driver</string>
+    <string name="begin_order_page_title">Start Order</string>
     <string name="wait_order_page_title">待跑訂單</string>
-    <string name="order_process_page_title">訂單處理</string>
+    <string name="order_process_page_title">Order process</string>
     <string name="merchandise_page_title">貨單資訊</string>
     <string name="passenger_page_title">乘車資訊</string>
     <string name="verify_code_title">驗證碼</string>
-    <string name="bouns_record_title">積分紀錄</string>
+    <string name="bouns_record_title">Points Record</string>
     <string name="client_take_ride_title">一般搭乘</string>
     <string name="client_send_merchandise_title">貨物快送</string>
     <string name="client_book_marks_title">常用地點</string>
@@ -49,7 +49,7 @@
     <string name="driver_comment_title">司機評分</string>
     <string name="client_comment_title">客戶評分</string>
     <string name="driver_report">檢舉司機</string>
-    <string name="app_report">APP評分</string>
+    <string name="app_report">APP comments</string>
     <string name="merchandise_calculator">才數計算機</string>
     <string name="map_location">選擇地點</string>
     <string name="query_driver_map_location">司機位置</string>
@@ -63,11 +63,11 @@
     <string name="driver_idenity_page_title">選擇身份</string>
     <string name="driver_login_page_title">司機登入</string>
     <!-- login page -->
-    <string name="app_name">App01</string>
+    <string name="app_name">App01_client</string>
     <string name="app_database_name">App01.realm</string>
     <string name="portal_login">Log In</string>
     <string name="portal_clean">Sign Out</string>
-    <string name="login_id_title">*cellphone</string>
+    <string name="login_id_title">*Phone Number</string>
     <string name="login_password_title">*Password</string>
     <string name="hint_default_portal_id">phone number</string>
     <string name="hint_default_portal_password">Password</string>
@@ -92,22 +92,22 @@
     <string name="txt_id">*身分證</string>
 
     <!--  register page -->
-    <string name="txt_name_data">*姓名</string>
-    <string name="txt_id_data">*身分證字號</string>
-    <string name="txt_phone_data">*手機號碼</string>
-    <string name="txt_password_data">*登入密碼</string>
-    <string name="txt_password_confirm">*密碼確認</string>
-    <string name="txt_recommdator_code">推薦人代號</string>
+    <string name="txt_name_data">*Name</string>
+    <string name="txt_id_data">*Identification</string>
+    <string name="txt_phone_data">*phone number</string>
+    <string name="txt_password_data">*Login Password</string>
+    <string name="txt_password_confirm">*Confirm Password</string>
+    <string name="txt_recommdator_code">Referrer Id</string>
     <string name="hint_account_name">odaru@geovision.com.tw</string>
     <string name="hint_account_id">odaru123</string>
-    <string name="send_valid_code_button">傳送驗證碼</string>
-    <string name="check_aggree">我同意</string>
-    <string name="check_aggree_info">隱私政策和會員規則</string>
-    <string name="txt_choice_identify">*請選擇你要註冊的身份</string>
-    <string name="check_client">客戶</string>
-    <string name="check_driver">駕駛</string>
-    <string name="register_error_title">註冊失敗</string>
-    <string name="finish_register_title">司機資格審核中</string>
+    <string name="send_valid_code_button">Request Verify Code</string>
+    <string name="check_aggree">I agree</string>
+    <string name="check_aggree_info">privacy and rule</string>
+    <string name="txt_choice_identify">*Please select driver type</string>
+    <string name="check_client">Customer</string>
+    <string name="check_driver">Driver</string>
+    <string name="register_error_title">Register fail</string>
+    <string name="finish_register_title">Verified driver qualifications</string>
     <string name="finish_register">審核通過後將開啟接單功能\n請等候簡訊</string>
 
 
@@ -115,33 +115,33 @@
     <!-- MenuMainActivity -->
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="begin_order">開始接單</string>
-    <string name="order_filer">訂單篩選</string>
-    <string name="wait_list">待跑訂單</string>
-    <string name="past_order">過去訂單</string>
-    <string name="order">建立訂單</string>
-    <string name="order_record">訂單紀錄</string>
-    <string name="support">客戶支援</string>
-    <string name="notification">最新通知</string>
-    <string name="about">關於第一幫</string>
-    <string name="share">與朋友分享</string>
-    <string name="account">我的帳戶</string>
-    <string name="wallet">我的錢包</string>
-    <string name="bouns">積分獎勵</string>
-    <string name="driver">成為司機</string>
-    <string name="logOut">登出</string>
+    <string name="begin_order">Order</string>
+    <string name="order_filer">Filter</string>
+    <string name="wait_list">Waited Order</string>
+    <string name="past_order">Past Order</string>
+    <string name="order">Order</string>
+    <string name="order_record">Order History</string>
+    <string name="support">Support</string>
+    <string name="notification">News</string>
+    <string name="about">About</string>
+    <string name="share">Share</string>
+    <string name="account">Account</string>
+    <string name="wallet">Wallet</string>
+    <string name="bouns">Bonus</string>
+    <string name="driver">Became Driver</string>
+    <string name="logOut">Log Out</string>
 
     <!-- fragment_client_service -->
-    <string name="service_info">請選擇需要的服務</string>
-    <string name="service_take">一般搭乘</string>
-    <string name="service_send_merchandise">貨物快送</string>
-    <string name="service_pick_up_train">車站接送</string>
-    <string name="service_pick_up_airplane">機場接送</string>
-    <string name="service_taxi">計程車</string>
+    <string name="service_info">What kinds of service do you want?</string>
+    <string name="service_take">get a ride</string>
+    <string name="service_send_merchandise">delivery merchandise</string>
+    <string name="service_pick_up_train">pick up from train station</string>
+    <string name="service_pick_up_airplane">pick up from airport</string>
+    <string name="service_taxi">Taxi</string>
     <string name="service_uber">Uber</string>
-    <string name="service_truck">小貨車</string>
-    <string name="service_big_truck">大貨車</string>
-    <string name="service_big_trailer">連結車</string>
+    <string name="service_truck">Truck</string>
+    <string name="service_big_truck">Cargo</string>
+    <string name="service_big_trailer">Trailer</string>
 
 
 
@@ -163,27 +163,27 @@
     <string name="dialog_btn_give_up_report">放棄報價</string>
 
     <!--fragment_Account -->
-    <string name="txt_change_account">修改密碼</string>
-    <string name="txt_obtain_comment">獲得評語</string>
-    <string name="txt_recommend_friend">我推薦的好友</string>
-    <string name="txt_apply_driver">成為司機</string>
-    <string name="txt_driver_identity">選擇司機身份</string>
+    <string name="txt_change_account">Change Password</string>
+    <string name="txt_obtain_comment">Comments</string>
+    <string name="txt_recommend_friend">Referred Friends</string>
+    <string name="txt_apply_driver">Be Driver</string>
+    <string name="txt_driver_identity">Pick Driver Identification</string>
 
     <!-- ChangeAccountActivity -->
-    <string name="txt_name_show">姓名</string>
-    <string name="txt_id_show">身分證</string>
-    <string name="txt_phone_show">手機</string>
-    <string name="txt_courrent_passwod">．舊密碼</string>
-    <string name="txt_new_passwod">．新密碼</string>
-    <string name="txt_passwod_confirm">．密碼確認</string>
+    <string name="txt_name_show">Name</string>
+    <string name="txt_id_show">Identification</string>
+    <string name="txt_phone_show">Phone Number</string>
+    <string name="txt_courrent_passwod">．Old Password</string>
+    <string name="txt_new_passwod">．New Password</string>
+    <string name="txt_passwod_confirm">．Confirm Password</string>
 
     <!-- RecommendActivity -->
     <string name="txt_obtain_prize">已為您賺取500積分</string>
     <!-- Fragment_Bouns -->
-    <string name="txt_next_title">下一次升級</string>
+    <string name="txt_next_title">Next Upgrade</string>
     <string name="txt_next_time">01小時58分32秒</string>
-    <string name="btn_upgrade">升級樹苗</string>
-    <string name="btn_next">積分記錄</string>
+    <string name="btn_upgrade">Upgrade</string>
+    <string name="btn_next">History</string>
     <string name="default_title">車神</string>
     <string name="default_info">可以領取以下獎勵</string>
     <string name="txt_prize_info">獲取積分200點</string>
@@ -191,11 +191,11 @@
     <!-- DriverIdentityActivity -->
     <string name="pick_identity_title">選擇註冊身份</string>
     <string name="pick_identity_info">每個手機只能註冊一種身份</string>
-    <string name="taxi_driver">計程車</string>
+    <string name="taxi_driver">Taxi</string>
     <string name="Uber_driver">UBER</string>
-    <string name="truck_driver">小貨車</string>
-    <string name="cargo_driver">大貨車</string>
-    <string name="trailer_driver">連結車</string>
+    <string name="truck_driver">Truck</string>
+    <string name="cargo_driver">Cargo</string>
+    <string name="trailer_driver">Trail</string>
     <string name="no_work">暫時不營業</string>
 
 

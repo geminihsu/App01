@@ -178,7 +178,6 @@ public class MainActivity extends Activity {
         password = ConfigSharedPreferencesUtil.getPassword(this, configSharedPreferences);
         this.findViews();
         this.setLister();
-
         Log.e(TAG,"Model Number:"+ Build.MODEL);
         if (!phone_number.isEmpty() && !password.isEmpty())
         {
@@ -280,6 +279,7 @@ public class MainActivity extends Activity {
             @Override
             public void run() {
                 sendDataRequest.sendLoginRequest(user,false);
+
             }
         }));
 

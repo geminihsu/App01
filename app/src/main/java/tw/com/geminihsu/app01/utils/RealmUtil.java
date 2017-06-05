@@ -10,6 +10,7 @@ import io.realm.RealmConfiguration;
 import io.realm.RealmResults;
 import tw.com.geminihsu.app01.R;
 import tw.com.geminihsu.app01.bean.AccountInfo;
+import tw.com.geminihsu.app01.bean.AccountTreeInfo;
 import tw.com.geminihsu.app01.bean.DriverIdentifyInfo;
 import tw.com.geminihsu.app01.bean.ImageBean;
 import tw.com.geminihsu.app01.bean.NormalOrder;
@@ -146,6 +147,12 @@ public class RealmUtil {
     public ServerSpecial queryServerSpecialItem(String column, String value) {
 
         ServerSpecial info = mRealm.where(ServerSpecial.class).equalTo(column, value).findFirst();
+        return info;
+    }
+
+    public AccountTreeInfo queryUserTreeInfo(String column, int value) {
+
+        AccountTreeInfo info = mRealm.where(AccountTreeInfo.class).equalTo(column, value).findFirst();
         return info;
     }
 
@@ -351,6 +358,26 @@ public class RealmUtil {
         info.setCountryName(data.getCountryName());
         info.setZipCode(data.getZipCode());
         info.setLocality(data.getLocality());
+
+
+        mRealm.copyToRealm(info);
+        mRealm.commitTransaction();
+    }
+
+    public void addUserTreeInfo(AccountTreeInfo data)
+    {
+        mRealm.beginTransaction();
+
+        AccountTreeInfo info = mRealm.createObject(AccountTreeInfo.class);
+        info.setUser_id(data.getUser_id());
+        info.setUser_uid(data.getUser_uid());
+        info.setUser_name(data.getUser_name());
+        info.setUser_did(data.getUser_did());
+        info.setAccesskey(data.getAccesskey());
+        info.setLv(data.getLv());
+        info.setLast_watering(data.getLast_watering());
+        info.setNext(data.getNext());
+        info.setStatus(data.getStatus());
 
 
         mRealm.copyToRealm(info);

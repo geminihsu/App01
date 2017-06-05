@@ -501,6 +501,7 @@ public class ClientTakeRideActivity extends Activity {
                 });
 
                 String require;
+                spec_list.clear();
                 ok.setOnClickListener(new View.OnClickListener() {
 
                     @Override
@@ -774,6 +775,8 @@ public class ClientTakeRideActivity extends Activity {
         order.setTarget(target);
         order.setRemark(remark.getText().toString());
 
+        if(price.equals(""))
+            price = "0";
         order.setPrice(price);
         order.setTip(tip);
 
@@ -1148,22 +1151,60 @@ public class ClientTakeRideActivity extends Activity {
     }
 
     private void sendOrder(){
+
         String departure_address_info;
         if(departure_detail!=null)
-            departure_address_info=departure_detail.getAddress();
+            departure_address_info="從："+departure_detail.getAddress()+"\n";
         else
-            departure_address_info = departure_address.getText().toString();
+            departure_address_info = "從："+departure_address.getText().toString()+"\n";
         String stop_address_info;
         if(stop_detail!=null)
-            stop_address_info=stop_detail.getAddress();
+            stop_address_info="停靠："+stop_detail.getAddress()+"\n";
         else
-            stop_address_info = stop_address.getText().toString();
+            stop_address_info = "停靠："+stop_address.getText().toString()+"\n";
 
         String destination_address_info;
         if(destination_detail!=null)
-            destination_address_info=destination_detail.getAddress();
+            destination_address_info="到："+destination_detail.getAddress()+"\n";
         else
-            destination_address_info = destination_address.getText().toString();
+            destination_address_info = "到："+destination_address.getText().toString()+"\n";
+
+
+        String type = "";
+        if (orderCargoType == Constants.APP_REGISTER_ORDER_TYPE.K_REGISTER_ORDER_TYPE_TAKE_RIDE)
+            type = getString(R.string.client_take_ride_title);
+        else if (orderCargoType == Constants.APP_REGISTER_ORDER_TYPE.K_REGISTER_ORDER_TYPE_PICK_UP_TRAIN)
+            type = getString(R.string.client_train_pick_up);
+        else if (orderCargoType == Constants.APP_REGISTER_ORDER_TYPE.K_REGISTER_ORDER_TYPE_PICK_UP_AIRPORT)
+            type = getString(R.string.client_airplane_pick_up);
+        else if (orderCargoType == Constants.APP_REGISTER_ORDER_TYPE.K_REGISTER_ORDER_TYPE_SEND_MERCHANDISE)
+            type = getString(R.string.client_merchanse_send_title);
+
+        String orderType = "";
+        if(realtime.isChecked())
+            orderType = "時間：即時"+"\n";
+        else
+            orderType = "時間："+time.getText().toString()+"\n";
+
+        String spec = "";
+
+        if(!spec_list.isEmpty())
+        {
+            spec = "特殊需求：";
+            for(ClientTakeRideSelectSpecListItem item:spec_list){
+                spec+=item.book_title+",";
+            }
+            spec = spec.substring(0,spec.length()-1)+"\n";
+
+
+        }
+
+        String markdetail="";
+        if(!remark.getText().toString().equals(""))
+            markdetail = "備註："+remark.getText().toString();
+
+        Utility info = new Utility(this);
+        AccountInfo user = info.getAccountInfo();
 
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
                 this);
@@ -1173,7 +1214,7 @@ public class ClientTakeRideActivity extends Activity {
 
         // set dialog message
         alertDialogBuilder
-                .setMessage(date.getText().toString()+"\t"+time.getText().toString()+"\n從:"+departure_address_info+"\n停:"+stop_address_info+"\n到:"+destination_address_info)
+                .setMessage("訂單類型:"+type+"\n"+"客戶電話:"+user.getPhoneNumber()+"\n"+orderType+departure_address_info+stop_address_info+destination_address_info+spec+markdetail)
                 .setCancelable(false)
                 .setPositiveButton(getString(R.string.cancel_take_spec), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
