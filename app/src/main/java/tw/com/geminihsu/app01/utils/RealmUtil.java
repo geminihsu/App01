@@ -15,6 +15,7 @@ import tw.com.geminihsu.app01.bean.DriverIdentifyInfo;
 import tw.com.geminihsu.app01.bean.ImageBean;
 import tw.com.geminihsu.app01.bean.NormalOrder;
 import tw.com.geminihsu.app01.bean.OrderLocationBean;
+//import tw.com.geminihsu.app01.bean.TreeInfoHistory;
 import tw.com.geminihsu.app01.bean.USerBookmark;
 import tw.com.geminihsu.app01.serverbean.ServerBookmark;
 import tw.com.geminihsu.app01.serverbean.ServerCarbrand;
@@ -155,6 +156,12 @@ public class RealmUtil {
         AccountTreeInfo info = mRealm.where(AccountTreeInfo.class).equalTo(column, value).findFirst();
         return info;
     }
+
+   /* public RealmResults<TreeInfoHistory> queryTreeInfoHistory(String column, int value) {
+
+        RealmResults<TreeInfoHistory> info = mRealm.where(TreeInfoHistory.class).findAll();
+        return info;
+    }*/
 
     public void addAccount(AccountInfo user)
     {
@@ -383,6 +390,25 @@ public class RealmUtil {
         mRealm.copyToRealm(info);
         mRealm.commitTransaction();
     }
+
+   /* public void addTreeInfoHistory(TreeInfoHistory data)
+    {
+        mRealm.beginTransaction();
+
+        TreeInfoHistory info = mRealm.createObject(TreeInfoHistory.class);
+        info.setUser_id(data.getUser_id());
+        info.setUser_uid(data.getUser_uid());
+        info.setUser_name(data.getUser_name());
+        info.setUser_did(data.getUser_did());
+        info.setAccesskey(data.getAccesskey());
+        info.setDate(data.getDate());
+        info.setAction(data.getAction());
+        info.setStatus(data.getStatus());
+
+
+        mRealm.copyToRealm(info);
+        mRealm.commitTransaction();
+    }*/
 
     public void updateAccount(AccountInfo user)
     {

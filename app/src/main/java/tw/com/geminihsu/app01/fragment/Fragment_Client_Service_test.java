@@ -177,6 +177,17 @@ public class Fragment_Client_Service_test extends Fragment  implements LocationL
         this.findViews();
         setLister();
 
+        ThreadPoolUtil.getThreadPoolExecutor().execute((new Runnable(){
+            @Override
+            public void run() {
+                if(getActivity()!=null) {
+                    Utility info = new Utility(getActivity());
+                    info.clearData(NormalOrder.class);
+                    sendDataRequest.getUserInfo(info.getAccountInfo(), false);
+                }
+            }
+        }));
+
         if(task == null) {
             task = new TimerTask() {
                 @Override

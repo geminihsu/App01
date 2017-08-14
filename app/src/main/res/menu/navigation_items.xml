@@ -7,6 +7,12 @@
             android:checked="true"
             android:icon="@drawable/ic_launcher"
             android:title="@string/begin_order"/>
+        <!-- for Customer application!-->
+        <item
+            android:id="@+id/navigation_item_order"
+            android:checked="true"
+            android:icon="@drawable/ic_launcher"
+            android:title="@string/order"/>
         <item
             android:id="@+id/navigation_item_order_record"
             android:icon="@drawable/ic_launcher"
@@ -28,12 +34,7 @@
             android:icon="@drawable/ic_launcher"
             android:title="@string/past_order"/>
 
-        <!-- for Customer application!-->
-        <item
-            android:id="@+id/navigation_item_order"
-            android:checked="true"
-            android:icon="@drawable/ic_launcher"
-            android:title="@string/order"/>
+
         <!-- for Customer application!-->
         <item
             android:id="@+id/navigation_item_support"

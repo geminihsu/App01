@@ -153,6 +153,8 @@ public class Fragment_Client_Service extends Fragment {
         if(getCurrentGPSLocationBroadcastReceiver!=null)
             getActivity().registerReceiver((getCurrentGPSLocationBroadcastReceiver), new IntentFilter("location_update"));
 
+
+
     }
         @Override
     public void onStart() {

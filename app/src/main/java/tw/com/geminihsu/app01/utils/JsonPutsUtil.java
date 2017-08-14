@@ -731,9 +731,13 @@ public class JsonPutsUtil {
                             treeInfo.setNext(tree_next);
                             treeInfo.setStatus(tree_status);
 
+                            RealmUtil database = new RealmUtil(mContext);
+                            database.clearDB(AccountTreeInfo.class);
+                            database.addUserTreeInfo(treeInfo);
 
                             if(!isCheckInfo) {
-                                RealmUtil database = new RealmUtil(mContext);
+
+
                                 database.clearDB(AccountInfo.class);
                                 database.clearDB(DriverIdentifyInfo.class);
                                 for(DriverIdentifyInfo driverIdentifyInfo : driverIdentifyInfos)
@@ -741,7 +745,7 @@ public class JsonPutsUtil {
                                     database.addDriverInfo(driverIdentifyInfo);
                                 }
                                 database.addAccount(user);
-                                database.addUserTreeInfo(treeInfo);
+
                                 //設定檔顯示登入的帳號密碼
                                 SharedPreferences configSharedPreferences = PreferenceManager.getDefaultSharedPreferences(mContext);
 

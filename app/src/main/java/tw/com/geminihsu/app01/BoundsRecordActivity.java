@@ -11,15 +11,20 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.realm.RealmResults;
 import tw.com.geminihsu.app01.adapter.RecommendListItem;
 import tw.com.geminihsu.app01.adapter.RecommendListItemAdapter;
+//import tw.com.geminihsu.app01.bean.TreeInfoHistory;
+import tw.com.geminihsu.app01.common.Constants;
+import tw.com.geminihsu.app01.utils.RealmUtil;
+import tw.com.geminihsu.app01.utils.Utility;
 
 public class BoundsRecordActivity extends Activity {
 
     private ListView listView;
     private final List<RecommendListItem> mCommentListData = new ArrayList<RecommendListItem>();;
     private RecommendListItemAdapter listViewAdapter;
-
+   // private RealmResults<TreeInfoHistory> treeInfo = null;
     private int MAXSIZE=3;
 
 
@@ -80,6 +85,9 @@ public class BoundsRecordActivity extends Activity {
 
     /* 從 xml 取得 OrderRecord 清單 */
     private void getDataFromDB() {
+        Utility info = new Utility(this);
+        RealmUtil data = new RealmUtil(this);
+        //treeInfo  = data.queryTreeInfoHistory(Constants.ACCOUNT_USER_ID,info.getAccountInfo().getId());
 
         mCommentListData.clear();
         try {
