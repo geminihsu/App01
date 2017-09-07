@@ -21,9 +21,7 @@ import tw.com.geminihsu.app01.serverbean.ServerDriverType;
 import tw.com.geminihsu.app01.serverbean.ServerImageType;
 import tw.com.geminihsu.app01.serverbean.ServerSpecial;
 
-/**
- * Created by Shreya Kotak on 04/05/16.
- */
+
 public class Utility {
     public final Context mContext;
 

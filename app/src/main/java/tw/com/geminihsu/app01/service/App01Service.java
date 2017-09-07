@@ -47,6 +47,12 @@ import tw.com.geminihsu.app01.utils.Utility;
 
 public class App01Service extends Service {
     private final String TAG = this.getClass().getSimpleName();
+
+    public final static String MY_BROADCAST_ACTION_ACCOUNT_EXPIRED = "tw.com.geminihsu.app01.accountExpiredNotification";
+    public static final String MY_BROADCAST_ACTION_ACCOUNT_EXPIRED_RESULT = "expiredFlag";
+    public static final String MY_BROADCAST_ACTION_ACCOUNT_EXPIRED_RESULT_MESSAGE = "expiredMessage";
+
+
     private final int GET_DEVICE_INFO_THREAD_SLEEP_TIME_SECOND = 10;
 
     private App01ServiceServiceBinder mBinder = new App01ServiceServiceBinder();
@@ -263,6 +269,11 @@ public class App01Service extends Service {
                 sendBroadcast(i);
                 Log.e(TAG, "Notify Server");
             }
+
+            @Override
+            public void accountExpired(boolean expired, String err) {
+                sendAccountExpiredNotify(expired,err);
+            }
         });
 
     }
@@ -282,6 +293,15 @@ public class App01Service extends Service {
     public void stopToGetNotifyInfo() {
         if (getPushNotifyInfo_thread_Thread != null)
             getPushNotifyInfo_thread_Thread.stopThisThread();
+    }
+
+    // 通知Account過期，帳戶被重新登入不同裝置
+    public void sendAccountExpiredNotify(boolean flag,String message) {
+        Intent intent = new Intent(MY_BROADCAST_ACTION_ACCOUNT_EXPIRED);
+        Bundle bundle = new Bundle();
+        bundle.putBoolean(MY_BROADCAST_ACTION_ACCOUNT_EXPIRED_RESULT,flag);
+        bundle.putString(MY_BROADCAST_ACTION_ACCOUNT_EXPIRED_RESULT_MESSAGE,message);
+        sendBroadcast(intent);
     }
 
     @Override

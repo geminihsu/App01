@@ -56,7 +56,7 @@ public class ClientTakeRideSelectSpecListItemAdapter extends ArrayAdapter<Client
 
 
 		}
-        
+
 
         return convertView;
     }

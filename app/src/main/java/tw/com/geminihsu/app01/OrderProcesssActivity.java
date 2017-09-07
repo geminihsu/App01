@@ -130,7 +130,11 @@ public class OrderProcesssActivity extends Activity implements LocationListener 
                 Toast.makeText(OrderProcesssActivity.this,
                         "訂單取消成功",
                         Toast.LENGTH_LONG).show();
-                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                //Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                //startActivity(intent);
+                //finish();
+
+                Intent intent = new Intent(getApplicationContext(), DriverCommentActivity.class);
                 startActivity(intent);
                 finish();
             }
@@ -398,6 +402,9 @@ public class OrderProcesssActivity extends Activity implements LocationListener 
                                 // current activity
 
                                 Intent question = new Intent(OrderProcesssActivity.this, DriverCommentActivity.class);
+                                Bundle b = new Bundle();
+                                b.putInt(DriverCommentActivity.BUNDLE_CLIENT, DriverCommentActivity.DRIVER_COMMENT);
+                                question.putExtras(b);
                                 startActivity(question);
                             }
                         });

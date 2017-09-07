@@ -16,6 +16,7 @@
             android:layout_alignParentLeft="true"
             android:focusable="false"
             android:focusableInTouchMode="false"
+            android:clickable="false"
             android:textColor="@color/btn_bouns_title"
             />
     </LinearLayout>

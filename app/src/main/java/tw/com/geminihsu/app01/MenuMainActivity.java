@@ -4,10 +4,12 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -61,6 +63,8 @@ public class MenuMainActivity extends AppCompatActivity implements Fragment_Begi
     private static final String[] LOCATION_PERMS={
             Manifest.permission.ACCESS_FINE_LOCATION
     };
+    private BroadcastReceiver notifyAccountExpiredBroadcastReceiver;//當收到通知後跳到登入頁面
+
     private static final int INITIAL_REQUEST=1337;
     private static final int LOCATION_REQUEST=100;
     public final static int ERROR_NO_GPS = 2;
@@ -143,11 +147,24 @@ public class MenuMainActivity extends AppCompatActivity implements Fragment_Begi
             bindService(serviceIntent, myLocalServiceConnection, Context.BIND_AUTO_CREATE);
         }
 
+        notifyAccountExpiredBroadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                //Bundle data = intent.getExtras();
+                //String message = data.getString(App01Service.MY_BROADCAST_ACTION_ACCOUNT_EXPIRED_RESULT_MESSAGE);
+                //Toast.makeText(MenuMainActivity.this,message,Toast.LENGTH_LONG).show();
+                viewDelegateBase.setNavigationItemOnClick__logOut();
+
+            }
+        };
+
     }
 
     @Override
     protected void onStart() {
         super.onStart();
+        registerReceiver((notifyAccountExpiredBroadcastReceiver), new IntentFilter(App01Service.MY_BROADCAST_ACTION_ACCOUNT_EXPIRED));
+
         this.findViews();
         this.setLister();
 
@@ -250,15 +267,22 @@ public class MenuMainActivity extends AppCompatActivity implements Fragment_Begi
                         ;
 
 
-                        mShareActionProvider =(ShareActionProvider)MenuItemCompat.getActionProvider(menuItem);
-                        setShareIntent(createShareIntent());
-
+                        //mShareActionProvider =(ShareActionProvider)MenuItemCompat.getActionProvider(menuItem);
+                        //setShareIntent(createShareIntent());
+                        Intent share = new Intent(Intent.ACTION_SEND);
+                        share.setType("text/plain"); // might be text, sound, whatever
+                        share.putExtra(Intent.EXTRA_SUBJECT, "App01");
+                        String sAux = "\nLet me recommend you this application\n\n";
+                        sAux = sAux + "https://play.google.com/store/apps/details?id=Orion.Soft \n\n";
+                        share.putExtra(Intent.EXTRA_TEXT, sAux);
+                        startActivity(Intent.createChooser(share, "Share"));
+                        return true;
 
                        /* Intent share = new Intent(Intent.ACTION_SEND);
                         share.setType("image/jpeg"); // might be text, sound, whatever
                         //share.putExtra(Intent.EXTRA_STREAM, pathToPicture);
                         startActivity(Intent.createChooser(share, "share"));*/
-                        return true;
+
                     case R.id.navigation_item_account:
                         viewDelegateBase.setNavigationItemOnClick_account();
                         return true;
@@ -279,11 +303,24 @@ public class MenuMainActivity extends AppCompatActivity implements Fragment_Begi
     }
         @Override
     public void onBackPressed() {
-        if (mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
-            mDrawerLayout.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
-        }
+            AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+            dialog.setTitle(getString(R.string.dialog_title_exit));
+            dialog.setMessage(getString(R.string.dialog_info_confirm_exit));
+            //dialog.setIcon(android.R.drawable.ic_dialog_alert);
+            dialog.setCancelable(false);
+            dialog.setPositiveButton(getString(R.string.g_yes), new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    // 按下PositiveButton要做的事
+                    finish(); // or call the popBackStack on the container if necessary
+                }
+            });
+            dialog.setNegativeButton(getString(R.string.g_no), new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+
+                }
+            });
+
+            dialog.show();
     }
 
     @Override
@@ -292,6 +329,9 @@ public class MenuMainActivity extends AppCompatActivity implements Fragment_Begi
         if(myBinder!=null)
            myBinder.stopToGetNotifyInfo();
         unbindService(myLocalServiceConnection);
+
+        unregisterReceiver(notifyAccountExpiredBroadcastReceiver);
+
     }
     // Call to update the share intent
     private void setShareIntent(Intent shareIntent) {

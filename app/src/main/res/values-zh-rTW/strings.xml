@@ -138,7 +138,7 @@
     <string name="service_pick_up_train">車站接送</string>
     <string name="service_pick_up_airplane">機場接送</string>
     <string name="service_taxi">計程車</string>
-    <string name="service_uber">Uber</string>
+    <string name="service_uber">UDer</string>
     <string name="service_truck">小貨車</string>
     <string name="service_big_truck">大貨車</string>
     <string name="service_big_trailer">連結車</string>
@@ -174,7 +174,8 @@
     <!-- RecommendActivity -->
     <string name="txt_obtain_prize">已為您賺取500積分</string>
     <!-- Fragment_Bouns -->
-    <string name="txt_next_title">下一次升級</string>
+    <string name="txt_next_title">離下一次升級的時間:</string>
+    <string name="txt_now_upgrade">現在可以升級</string>
     <string name="txt_next_time">01小時58分32秒</string>
     <string name="btn_upgrade">升級樹苗</string>
     <string name="btn_next">積分紀錄</string>
@@ -456,7 +457,9 @@
     <string name="unit_total">合計</string>
     <string name="unit_total_count">才</string>
     <string name="unit_total_count_example"><u>5</u></string>
-
+    <string name="unit_hit_length">請輸入物體寬度(cm)</string>
+    <string name="unit_hit_width">請輸入物體高度(cm)</string>
+    <string name="unit_title">貨物才數</string>
        //Camera2RawFragment
     <string name="request_permission">This app needs camera permission.</string>
     <string name="picture">Picture</string>
@@ -467,6 +470,25 @@
     <string name="map_add_bookmark">輸入名稱</string>
     <string name="map_search_address">請輸入要查詢的地點</string>
 
+    //spec menu
+    <string name="fragment_filter_pop_dialog_title">Filter Type</string>
+    <!-- global string -->
+    <string name="g_done">Done</string>
+    <string name="g_back">Back</string>
+    <string name="g_add">Add</string>
+    <string name="g_modify">Modify</string>
+    <string name="g_delete">Delete</string>
+    <string name="g_ok">OK</string>
+    <string name="g_no">NO</string>
+    <string name="g_yes">YES</string>
+    <string name="g_cancel">Cancel</string>
+    <string name="g_select_all">Select All</string>
+    <string name="language_end">.</string>
+
+
+    <!-- dialog 內容 -->
+    <string name="dialog_title_exit">Exit?</string>
+    <string name="dialog_info_confirm_exit">Do you want to exit?</string>
 
 </resources>
 

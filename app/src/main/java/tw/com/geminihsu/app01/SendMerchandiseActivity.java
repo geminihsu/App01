@@ -3,6 +3,7 @@ package tw.com.geminihsu.app01;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
@@ -13,13 +14,16 @@ import android.text.style.ForegroundColorSpan;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 
 import tw.com.geminihsu.app01.bean.AccountInfo;
 import tw.com.geminihsu.app01.bean.NormalOrder;
 import tw.com.geminihsu.app01.bean.OrderLocationBean;
 import tw.com.geminihsu.app01.common.Constants;
+import tw.com.geminihsu.app01.utils.DateTimeUtil;
 import tw.com.geminihsu.app01.utils.JsonPutsUtil;
+import tw.com.geminihsu.app01.utils.ThreadPoolUtil;
 import tw.com.geminihsu.app01.utils.Utility;
 
 public class SendMerchandiseActivity extends Activity {
@@ -32,6 +36,10 @@ public class SendMerchandiseActivity extends Activity {
     private int choice = 0;
     private NormalOrder order;
     private JsonPutsUtil sendDataRequest;
+    private ProgressDialog progressDialog_loading;
+    private EditText client_name;
+    private EditText client_phone;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,11 +53,25 @@ public class SendMerchandiseActivity extends Activity {
             @Override
             public void createNormalOrder(NormalOrder order) {
 
-                Intent question = new Intent(SendMerchandiseActivity.this, ClientTakeRideSearchActivity.class);
+                /*Intent question = new Intent(SendMerchandiseActivity.this, ClientTakeRideSearchActivity.class);
                 Bundle b = new Bundle();
                 b.putInt(Constants.ARG_POSITION, ClientTakeRideSearchActivity.DRIVER_REPORT_PRICE);
                 question.putExtras(b);
-                startActivity(question);
+                startActivity(question);*/
+                if(progressDialog_loading!=null)
+                {
+                    progressDialog_loading.cancel();
+                    progressDialog_loading = null;
+                }
+
+                Intent intent = new Intent(getApplicationContext(), ClientTakeRideSearchActivity.class);
+
+                Bundle b = new Bundle();
+                b.putInt(Constants.ARG_POSITION, Integer.valueOf(order.getTicket_id()));
+                intent.putExtras(b);
+                startActivity(intent);
+                //finish();
+
             }
 
             @Override
@@ -89,8 +111,9 @@ public class SendMerchandiseActivity extends Activity {
 
     private void findViews()
     {
-       target = (LinearLayout) findViewById(R.id.txt_target);
-
+        target = (LinearLayout) findViewById(R.id.txt_target);
+        client_name = (EditText) findViewById(R.id.client_name);
+        client_phone = (EditText) findViewById(R.id.client_phone);
     }
 
 
@@ -102,9 +125,9 @@ public class SendMerchandiseActivity extends Activity {
     }
 
     private void displayLayout() {
-        if (choice == CLIENT_SEND_MERCHANDISE) {
+        /*if (choice == CLIENT_SEND_MERCHANDISE) {
             target.setVisibility(View.GONE);
-        }
+        }*/
     }
 
     @Override
@@ -126,7 +149,7 @@ public class SendMerchandiseActivity extends Activity {
         switch (item.getItemId()) {
 
             case ACTIONBAR_MENU_ITEM_SUMMIT:
-                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+                /*AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
                         this);
 
                 // set title
@@ -153,7 +176,35 @@ public class SendMerchandiseActivity extends Activity {
                 AlertDialog alertDialog = alertDialogBuilder.create();
 
                 // show it
-                alertDialog.show();
+                alertDialog.show();*/
+                Utility info = new Utility(this);
+                AccountInfo user = info.getAccountInfo();
+
+                String stop = "";
+                if(order.getStop_address() != null && !order.getStop_address().equals(""))
+                    stop = "停："+order.getStop_address()+"\n";
+                else
+                    stop = "停：" + "\n";
+
+                String spec = "";
+                if(order.getCar_special() != null && !order.getCar_special().equals(""))
+                    spec ="特殊需求："+order.getCar_special()+"\n";
+                else
+                    spec = "特殊需求：" + "\n";
+
+                String mark = "";
+
+                if(!client_name.getText().toString().equals("")&&!client_phone.getText().toString().equals(""))
+                    order.setRemark(order.getRemark()+"\n"+"收貨人姓名:"+client_name.getText().toString()+"\n"+"收貨人電話:"+client_phone.getText().toString()+"\n");
+                if(order.getRemark() != null && !order.getRemark().equals(""))
+                    mark ="備註："+order.getRemark()+"\n";
+                else
+                    mark = "備註："+"\n";
+
+
+                String data = "訂單類型:"+getString(R.string.client_merchanse_send_title)+"\n"+"客戶電話:"+user.getPhoneNumber()+"\n"+"時間："+ "即時"+"\n"+"從："+order.getBegin_address()+"\n"+stop+"到："+order.getEnd_address()+"\n"+spec+mark;
+
+                confirmAlert(data);
                 return true;
             case android.R.id.home:
                 // app icon in action bar clicked; goto parent activity.
@@ -212,6 +263,49 @@ public class SendMerchandiseActivity extends Activity {
 
         //sendDataRequest.putCreateNormalOrder(order);
 
+    }
+
+    private void confirmAlert(String content)
+    {
+
+
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+                this);
+
+        // set title
+        alertDialogBuilder.setTitle(getString(R.string.menu_dialog_sure));
+
+        // set dialog message
+        alertDialogBuilder
+                .setMessage(content)
+                .setCancelable(false)
+                .setPositiveButton(getString(R.string.cancel_take_spec), new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+
+                    }
+                })
+                .setNegativeButton(getString(R.string.sure_take_spec), new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+
+                        if (progressDialog_loading == null) {
+                            progressDialog_loading = ProgressDialog.show(SendMerchandiseActivity.this, "",
+                                    "Loading. Please wait...", true);
+                        }
+                        ThreadPoolUtil.getThreadPoolExecutor().execute((new Runnable() {
+                            @Override
+                            public void run() {
+                                sendDataRequest.putCreateNormalOrder(order);
+                            }
+                        }));
+
+                    }
+                });
+
+        // create alert dialog
+        AlertDialog alertDialog = alertDialogBuilder.create();
+
+        // show it
+        alertDialog.show();
     }
 
 }

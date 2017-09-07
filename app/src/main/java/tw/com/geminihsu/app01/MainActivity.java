@@ -6,8 +6,11 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -35,6 +38,7 @@ import tw.com.geminihsu.app01.bean.AccountInfo;
 import tw.com.geminihsu.app01.bean.DriverIdentifyInfo;
 import tw.com.geminihsu.app01.serverbean.ServerContents;
 import tw.com.geminihsu.app01.common.Constants;
+import tw.com.geminihsu.app01.service.App01Service;
 import tw.com.geminihsu.app01.utils.ConfigSharedPreferencesUtil;
 import tw.com.geminihsu.app01.utils.FileUtil;
 import tw.com.geminihsu.app01.utils.FormatUtils;
@@ -140,6 +144,8 @@ public class MainActivity extends Activity {
             }
         });
 
+
+
         }
 
     @Override
@@ -162,9 +168,20 @@ public class MainActivity extends Activity {
 
     }
 
+    @Override
+    protected void onStop()
+    {
+        super.onStop();
+        //unregisterReceiver(notifyAccountExpiredBroadcastReceiver);
 
+    }
 
+    @Override
+    protected void onDestroy()
+    {
+        super.onDestroy();
 
+    }
 
     @Override
     protected void onStart() {
@@ -267,6 +284,8 @@ public class MainActivity extends Activity {
             }
         });
     }
+
+
 
     private void queryAccount(){
 

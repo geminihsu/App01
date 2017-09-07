@@ -19,6 +19,8 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.os.CountDownTimer;
+import android.os.SystemClock;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -27,8 +29,10 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,6 +45,7 @@ import tw.com.geminihsu.app01.bean.AccountInfo;
 import tw.com.geminihsu.app01.bean.AccountTreeInfo;
 import tw.com.geminihsu.app01.bean.NormalOrder;
 import tw.com.geminihsu.app01.common.Constants;
+import tw.com.geminihsu.app01.utils.DateTimeUtil;
 import tw.com.geminihsu.app01.utils.JsonPutsUtil;
 import tw.com.geminihsu.app01.utils.RealmUtil;
 import tw.com.geminihsu.app01.utils.ThreadPoolUtil;
@@ -55,8 +60,10 @@ public class Fragment_Bouns extends Fragment {
     private PrizeListItemAdapter listViewAdapter;
     private Button record;
     private Button upgrade;
+    private TextView next_time;
     private AccountTreeInfo treeInfo = null;
     private JsonPutsUtil sendDataRequest;
+    private CountDownTimer countDownTimer;
 
     private int MAXSIZE=10;
     @Override
@@ -82,7 +89,7 @@ public class Fragment_Bouns extends Fragment {
         this.setListView();
         Utility info = new Utility(getActivity());
         RealmUtil data = new RealmUtil(getActivity());
-        treeInfo  = data.queryUserTreeInfo(Constants.ACCOUNT_USER_ID,info.getAccountInfo().getId());
+        treeInfo = data.queryUserTreeInfo(Constants.ACCOUNT_USER_ID, info.getAccountInfo().getId());
         sendDataRequest = new JsonPutsUtil(getActivity());
 
         sendDataRequest.setCustomerTreeWateringFeedBackManagerCallBackFunction(new JsonPutsUtil.CustomerTreeWateringCallBackFunction() {
@@ -90,11 +97,29 @@ public class Fragment_Bouns extends Fragment {
 
             @Override
             public void sendStatus(boolean status) {
+                if (status) {
+                    Toast.makeText(getActivity(),
+                            getString(R.string.txt_upgrade) + Integer.valueOf(treeInfo.getLv() + 1) + "級成功",
+                            Toast.LENGTH_LONG).show();
+                    if(countDownTimer!=null) {
+                        countDownTimer.cancel();
+                        countDownTimer = null;
+                    }
+                    next_time.setText("倒數時間: 2 小時 00 分 00 秒");
 
+
+                    if (countDownTimer == null) {
+                        long tsLong = System.currentTimeMillis()/1000;
+
+                        wateringTimer(tsLong, 7200);
+
+                    }else
+                        countDownTimer.start();
+                }
             }
         });
 
-        if(treeInfo.getLv() <1)
+        if (treeInfo.getLv() < 4)
             listView.setVisibility(View.GONE);
         getDataFromDB();
         // 建立ListItemAdapter
@@ -102,8 +127,53 @@ public class Fragment_Bouns extends Fragment {
         listView.setAdapter(listViewAdapter);
         listViewAdapter.notifyDataSetChanged();
 
+        Log.e(TAG,"Last_watering:"+new SimpleDateFormat("HH 時 mm 分 ss 秒").format(treeInfo.getLast_watering()));
+        Log.e(TAG,"getNext:"+treeInfo.getNext());
+        Log.e(TAG,"getNext:"+new SimpleDateFormat("HH 時 mm 分 ss 秒").format(treeInfo.getNext()));
+        Log.e(TAG,"Last_watering:"+treeInfo.getLast_watering());
+
+        if (treeInfo.getNext() == 0) {
+            next_time.setText("倒數時間: 0");
+        }
+
+        else if (countDownTimer == null) {
 
 
+            long limit = treeInfo.getLast_watering();
+            long next = treeInfo.getNext();
+
+            wateringTimer(limit,next);
+
+
+        }
+    }
+
+
+    private void wateringTimer(final long limit, final long next)
+    {
+        countDownTimer = new CountDownTimer(limit, 1000) {
+
+            @Override
+            public void onFinish() {
+                next_time.setText(getString(R.string.txt_now_upgrade));
+                countDownTimer = null;
+            }
+
+            @Override
+            public void onTick(long millisUntilFinished) {
+                //String countdownTime = DateTimeUtil.convertMillisecondsTimeToString_yyyymmdd_hhmmss(millisUntilFinished);
+                //next_time.setText(countdownTime);
+                //next_time.setText("倒數時間:" + new SimpleDateFormat("HH 時 mm 分 ss 秒").format(treeInfo.getLast_watering()  - (limit - treeInfo.getNext() - millisUntilFinished)));
+
+                if(limit < 3600)
+                    next_time.setText("倒數時間:" + new SimpleDateFormat(" 00 時 mm 分 ss 秒").format(limit  - ((limit + 72000) - next - millisUntilFinished)));
+                else if(limit > 3600)
+                    next_time.setText("倒數時間:" + new SimpleDateFormat(" 01 時 mm 分 ss 秒").format(limit  - ((limit + 72000) - next - millisUntilFinished)));
+
+
+            }
+
+        }.start();
     }
 
     @Override
@@ -116,6 +186,10 @@ public class Fragment_Bouns extends Fragment {
     @Override
 	public void onStop() {
 		super.onStop();
+        if(countDownTimer!=null) {
+            countDownTimer.cancel();
+            countDownTimer = null;
+        }
 
 	}
 
@@ -124,7 +198,7 @@ public class Fragment_Bouns extends Fragment {
         listView = (ListView) getView().findViewById(R.id.listView1);
         record = (Button) getView().findViewById(R.id.bouns_record);
         upgrade = (Button) getView().findViewById(R.id.bouns_upgrade);
-
+        next_time = (TextView) getView().findViewById(R.id.next_time);
     }
 
     private void setListView()
@@ -199,7 +273,7 @@ public class Fragment_Bouns extends Fragment {
                     Bitmap bm1 = BitmapFactory.decodeResource(getResources(), R.drawable.ic_camera_72x72);
                     //Bitmap bm2 = BitmapFactory.decodeResource(getResources(), R.drawable.ic_online);
                     PrizeListItem item = new PrizeListItem();
-                    if(treeInfo.getLv() == 1)
+                    if(treeInfo.getLv() == 4)
                         item.prize_title = "積分200點";
                     item.take = "領取";
                     mPrizeListData.add(item);

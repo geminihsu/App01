@@ -13,4 +13,8 @@
 
     <dimen name="dock_panel_item_right_right_paddind">12dp</dimen>
     <dimen name="dock_panel_item_left_right_paddind">12dp</dimen>
+
+
+    <dimen name="default_text_address_host_size_sp">16sp</dimen>
+
 </resources>

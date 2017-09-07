@@ -138,7 +138,7 @@
     <string name="service_pick_up_train">pick up from train station</string>
     <string name="service_pick_up_airplane">pick up from airport</string>
     <string name="service_taxi">Taxi</string>
-    <string name="service_uber">Uber</string>
+    <string name="service_uber">UDer</string>
     <string name="service_truck">Truck</string>
     <string name="service_big_truck">Cargo</string>
     <string name="service_big_trailer">Trailer</string>
@@ -180,13 +180,16 @@
     <!-- RecommendActivity -->
     <string name="txt_obtain_prize">已為您賺取500積分</string>
     <!-- Fragment_Bouns -->
-    <string name="txt_next_title">Next Upgrade</string>
+    <string name="txt_next_title">離下一次升級的時間:</string>
+    <string name="txt_now_upgrade">現在可以升級</string>
     <string name="txt_next_time">01小時58分32秒</string>
     <string name="btn_upgrade">Upgrade</string>
     <string name="btn_next">History</string>
     <string name="default_title">車神</string>
     <string name="default_info">可以領取以下獎勵</string>
     <string name="txt_prize_info">獲取積分200點</string>
+    <string name="txt_upgrade">升</string>
+
 
     <!-- DriverIdentityActivity -->
     <string name="pick_identity_title">選擇註冊身份</string>
@@ -451,7 +454,10 @@
     <string name="unit_total">合計</string>
     <string name="unit_total_count">才</string>
     <string name="unit_total_count_example"><u>5</u></string>
-
+    <string name="unit_title">貨物才數</string>
+    <string name="unit_hit_length">請輸入物體長度(cm)</string>
+    <string name="unit_hit_width">請輸入物體寬度(cm)</string>
+    <string name="unit_hit_high">請輸入物體高度(cm)</string>
     //Camera2RawFragment
     <string name="request_permission">This app needs camera permission.</string>
     <string name="picture">Picture</string>
@@ -460,6 +466,27 @@
     <string name="map_bookmark">加入常用</string>
     <string name="map_add_bookmark">輸入名稱</string>
     <string name="map_search_address">請輸入要查詢的地點</string>
+
+
+    //spec menu
+    <string name="fragment_filter_pop_dialog_title">Filter Type</string>
+    <!-- global string -->
+    <string name="g_done">Done</string>
+    <string name="g_back">Back</string>
+    <string name="g_add">Add</string>
+    <string name="g_modify">Modify</string>
+    <string name="g_delete">Delete</string>
+    <string name="g_ok">OK</string>
+    <string name="g_no">NO</string>
+    <string name="g_yes">YES</string>
+    <string name="g_cancel">Cancel</string>
+    <string name="g_select_all">Select All</string>
+    <string name="language_end">.</string>
+
+    <!-- dialog 內容 -->
+    <string name="dialog_title_exit">Exit?</string>
+    <string name="dialog_info_confirm_exit">Do you want to exit?</string>
+
 
 </resources>
 

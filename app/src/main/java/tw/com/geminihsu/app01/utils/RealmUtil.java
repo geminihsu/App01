@@ -15,7 +15,6 @@ import tw.com.geminihsu.app01.bean.DriverIdentifyInfo;
 import tw.com.geminihsu.app01.bean.ImageBean;
 import tw.com.geminihsu.app01.bean.NormalOrder;
 import tw.com.geminihsu.app01.bean.OrderLocationBean;
-//import tw.com.geminihsu.app01.bean.TreeInfoHistory;
 import tw.com.geminihsu.app01.bean.USerBookmark;
 import tw.com.geminihsu.app01.serverbean.ServerBookmark;
 import tw.com.geminihsu.app01.serverbean.ServerCarbrand;
@@ -157,7 +156,7 @@ public class RealmUtil {
         return info;
     }
 
-   /* public RealmResults<TreeInfoHistory> queryTreeInfoHistory(String column, int value) {
+    /*public RealmResults<TreeInfoHistory> queryTreeInfoHistory(String column, int value) {
 
         RealmResults<TreeInfoHistory> info = mRealm.where(TreeInfoHistory.class).findAll();
         return info;
@@ -391,7 +390,7 @@ public class RealmUtil {
         mRealm.commitTransaction();
     }
 
-   /* public void addTreeInfoHistory(TreeInfoHistory data)
+    /*public void addTreeInfoHistory(TreeInfoHistory data)
     {
         mRealm.beginTransaction();
 
@@ -567,6 +566,8 @@ public class RealmUtil {
 
         mRealm.commitTransaction();
     }
+
+
 
     public void clearDB(final Class table) {
         mRealm.executeTransaction(new Realm.Transaction() {

@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/white"
+    android:orientation="vertical" 
+    >
+   <!--  <android.support.v4.widget.SwipeRefreshLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/refreshlayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"> -->
+ 
+    <RelativeLayout
+        android:id="@+id/title_template"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginLeft="12dp"
+        android:padding="10dp" >
+
+        <TextView
+            android:id="@+id/textView1"
+            style="?android:attr/textAppearanceLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:textColor="@color/filter_pop_list_txt_color"
+            android:textSize="@dimen/default_text_address_host_size_sp"
+            android:text="@string/merchandise_requirement" />
+
+
+    </RelativeLayout>
+
+    <View
+        android:id="@+id/titleDivider"
+        android:layout_width="match_parent"
+        android:layout_height="1dip"
+        android:background="@color/filter_pop_list_divider_color" />
+    <LinearLayout
+        android:id="@+id/contentPanel"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical" >
+
+	<ListView android:id="@+id/listviewicon"
+		 android:layout_width="fill_parent"
+		 android:layout_height="fill_parent"
+		 android:divider="@color/filter_pop_list_divider_color"
+		 android:dividerHeight="1dp"
+	/>
+
+   </LinearLayout>
+    <View
+        android:id="@+id/titlebuttonDivider"
+        android:layout_width="match_parent"
+        android:layout_height="1dip"
+        android:background="@color/filter_pop_list_divider_color" />
+ 	<LinearLayout
+        android:id="@+id/buttonPanel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <Button
+            android:id="@+id/button_category_ok"
+            android:layout_width="fill_parent"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:background="@color/transparent"
+            android:textColor="@color/filter_pop_list_button_txt_color"
+            android:text="@string/g_ok"/>
+        <View
+            android:id="@+id/border"
+            android:layout_width="1dip"
+            android:layout_height="match_parent"
+            android:background="@color/filter_pop_list_divider_color" />
+
+        <Button
+            android:id="@+id/button_category_cancel"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/transparent"
+            android:textColor="@color/filter_pop_list_button_txt_color"
+            android:text="@string/g_cancel"/>
+    </LinearLayout>
+    
+	<!-- </android.support.v4.widget.SwipeRefreshLayout> -->
+</LinearLayout>

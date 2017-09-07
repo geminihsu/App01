@@ -9,7 +9,6 @@ import android.app.ProgressDialog;
 import android.app.TimePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.location.Address;
@@ -18,13 +17,13 @@ import android.os.Bundle;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -42,7 +41,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 import io.realm.RealmResults;
 import tw.com.geminihsu.app01.adapter.ClientTakeRideSelectSpecListItem;
@@ -53,7 +51,6 @@ import tw.com.geminihsu.app01.bean.NormalOrder;
 import tw.com.geminihsu.app01.bean.OrderLocationBean;
 import tw.com.geminihsu.app01.bean.USerBookmark;
 import tw.com.geminihsu.app01.common.Constants;
-import tw.com.geminihsu.app01.serverbean.ServerBookmark;
 import tw.com.geminihsu.app01.serverbean.ServerSpecial;
 import tw.com.geminihsu.app01.utils.DateTimeUtil;
 import tw.com.geminihsu.app01.utils.JsonPutsUtil;
@@ -95,7 +92,7 @@ public class ClientTakeRideActivity extends Activity {
     private RadioButton realtime;
     private RadioButton reservation;
     private TextView show_title;
-    private TextView spec_value;
+    private EditText spec_value;
     private EditText date;
     private EditText time;
     private EditText departure_address;
@@ -104,7 +101,7 @@ public class ClientTakeRideActivity extends Activity {
     private EditText remark;
     private EditText merchandise_content;
     private EditText merchandise_weight;
-    private EditText merchandise_unit;
+    private TextView merchandise_unit;
     private int option;
 
     private final List<ClientTakeRideSelectSpecListItem> mCommentListData = new ArrayList<ClientTakeRideSelectSpecListItem>();;
@@ -133,8 +130,10 @@ public class ClientTakeRideActivity extends Activity {
     private ArrayList<ClientTakeRideSelectSpecListItem> spec_list;
 
     private ProgressDialog progressDialog_loading;
+    private AlertDialog choiceSpecAlertDialog;
 
     private String currAddress = "";
+    private ArrayList<String> specData = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -229,7 +228,7 @@ public class ClientTakeRideActivity extends Activity {
         destination = (ImageButton) findViewById(R.id.destination);
         spec = (ImageButton) findViewById(R.id.spec_option);
         show_title = (TextView) findViewById(R.id.txt_info);
-        spec_value = (TextView) findViewById(R.id.passenger_spec_value);
+        spec_value = (EditText) findViewById(R.id.passenger_spec_value);
 
         radioGroup_type = (RadioGroup) findViewById(R.id.source);
         realtime = (RadioButton)findViewById(R.id.real_radio);
@@ -244,7 +243,7 @@ public class ClientTakeRideActivity extends Activity {
         destination_address = (EditText) findViewById(R.id.destination_address);
         merchandise_content = (EditText) findViewById(R.id.merchandise_content_info);
         merchandise_weight = (EditText) findViewById(R.id.merchandise_weight);
-        merchandise_unit = (EditText) findViewById(R.id.merchandise_unit);
+        merchandise_unit = (TextView) findViewById(R.id.merchandise_unit);
 
 
         Date dateIfo=new Date();
@@ -457,7 +456,7 @@ public class ClientTakeRideActivity extends Activity {
             }
         });
 
-        getDataFromDB();
+        /*getDataFromDB();
         linearLayout_spec.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -476,9 +475,12 @@ public class ClientTakeRideActivity extends Activity {
                 requirement.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
 
-                        ClientTakeRideSelectSpecListItem item = mCommentListData.get(position);
-                        item.check= !item.check;
-                        mCommentListData.set(position,item);
+                        ClientTakeRideSelectSpecListItemAdapter adapter = (ClientTakeRideSelectSpecListItemAdapter) parent.getAdapter();
+                        ClientTakeRideSelectSpecListItem c = (ClientTakeRideSelectSpecListItem) adapter.getItem(position);
+                        c.check = !c.check;
+                        //ClientTakeRideSelectSpecListItem item = mCommentListData.get(position);
+                        //item.check= !item.check;
+                        //mCommentListData.set(position,item);
                         listViewAdapter.notifyDataSetChanged();
                     }
                 });
@@ -523,10 +525,12 @@ public class ClientTakeRideActivity extends Activity {
                     }
                 });
 
-            }
-        });
 
-        spec.setOnClickListener(new View.OnClickListener() {
+            }
+
+        });*/
+
+        /*spec.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
@@ -587,9 +591,27 @@ public class ClientTakeRideActivity extends Activity {
                 });
 
             }
+        });*/
+
+        spec.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                choiceSpecFilter();
+            }
+        });
+
+        spec_value.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                choiceSpecFilter();
+            }
         });
 
 
+        merchandise_unit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                calculateMerchandiseUnit();
+            }
+        });
     }
 
 
@@ -618,9 +640,11 @@ public class ClientTakeRideActivity extends Activity {
 
             case ACTIONBAR_MENU_ITEM_SUMMIT:
                 //if (option == ClientTakeRideActivity.TAKE_RIDE) {
-               if(!departure_address.getText().toString().isEmpty())
+               if(!departure_address.getText().toString().isEmpty() && option != ClientTakeRideActivity.SEND_MERCHANDISE)
                      sendOrder();
-                else
+               else if(option == ClientTakeRideActivity.SEND_MERCHANDISE && !departure_address.getText().toString().isEmpty() && !destination_address.getText().toString().isEmpty())
+                     sendOrder();
+               else
                    alert();
                 return true;
             case android.R.id.home:
@@ -773,16 +797,20 @@ public class ClientTakeRideActivity extends Activity {
         order.setTicket_status("0");
         order.setOrderdate(time.getText().toString());
         order.setTarget(target);
-        order.setRemark(remark.getText().toString());
+
+        if(!remark.getText().toString().equals(""))
+            order.setRemark(remark.getText().toString());
 
         if(price.equals(""))
             price = "0";
+        if(tip.equals(""))
+            tip = "0";
         order.setPrice(price);
         order.setTip(tip);
 
-        if (option == ClientTakeRideActivity.SEND_MERCHANDISE)
+        if (option == ClientTakeRideActivity.SEND_MERCHANDISE && !merchandise_content.getText().toString().equals("") && !merchandise_unit.getText().toString().equals(""))
         {
-            order.setRemark(merchandise_content.getText().toString()+","+merchandise_weight.getText().toString()+","+merchandise_unit.getText().toString());
+            order.setRemark("\n"+getString(R.string.merchandise_content)+merchandise_content.getText().toString()+"\n"+getString(R.string.merchandise_weight)+merchandise_weight.getText().toString()+"\n"+getString(R.string.merchandise_unit)+merchandise_unit.getText().toString());
         }
 
         String spec="";
@@ -792,74 +820,38 @@ public class ClientTakeRideActivity extends Activity {
                 spec+=item.spec_id+",";
             }
             spec = spec.substring(0,spec.length()-1);
-
+            Log.e(TAG,"spec car:"+spec);
+            order.setCar_special(spec);
         }
-        Log.e(TAG,"spec car:"+spec);
-        order.setCar_special(spec);
 
-        //sendDataRequest.putCreateQuickTaxiOrder(order);
-        if(progressDialog_loading==null) {
-            progressDialog_loading = ProgressDialog.show(this, "",
-                    "Loading. Please wait...", true);
-        }
-        ThreadPoolUtil.getThreadPoolExecutor().execute((new Runnable(){
-            @Override
-            public void run() {
-                sendDataRequest.putCreateNormalOrder(order);
+
+        if (option == ClientTakeRideActivity.SEND_MERCHANDISE) {
+            //貨物快遞需填寫收件人資訊
+            Intent question = new Intent(ClientTakeRideActivity.this, SendMerchandiseActivity.class);
+            Bundle b = new Bundle();
+            b.putInt(Constants.ARG_POSITION, SendMerchandiseActivity.CLIENT_SEND_MERCHANDISE);
+            b.putSerializable(ClientTakeRideActivity.BUNDLE_ORDER_TICKET_ID, order);
+            question.putExtras(b);
+            startActivity(question);
+
+        }else {
+            //sendDataRequest.putCreateQuickTaxiOrder(order);
+            if (progressDialog_loading == null) {
+                progressDialog_loading = ProgressDialog.show(this, "",
+                        "Loading. Please wait...", true);
             }
-        }));
+            ThreadPoolUtil.getThreadPoolExecutor().execute((new Runnable() {
+                @Override
+                public void run() {
+                    sendDataRequest.putCreateNormalOrder(order);
+                }
+            }));
 
-
+        }
     }
 
 
-    private void createTempTaxiOrder(String target)
-    {
 
-        Utility info = new Utility(ClientTakeRideActivity.this);
-        driver = info.getAccountInfo();
-        OrderLocationBean begin_location = new OrderLocationBean();
-        begin_location.setId(1);
-        begin_location.setLatitude("24.09133");
-        begin_location.setLongitude("120.540315");
-        begin_location.setZipcode("404");
-        begin_location.setAddress(departure_address.getText().toString());
-
-        OrderLocationBean stop_location = new OrderLocationBean();
-        stop_location.setId(2);
-        stop_location.setLatitude("24.14411");
-        stop_location.setLongitude("120.679567");
-        stop_location.setZipcode("400");
-        stop_location.setAddress("台中市中區柳川里成功路300號");
-
-
-        OrderLocationBean end_location = new OrderLocationBean();
-        end_location.setId(3);
-        end_location.setLatitude("24.14411");
-        end_location.setLongitude("120.679567");
-        end_location.setZipcode("400");
-        end_location.setAddress(destination_address.getText().toString());
-
-
-
-        NormalOrder order = new NormalOrder();
-        order.setUser_id(driver.getId());
-        order.setUser_uid(driver.getUid());
-        order.setUser_name(driver.getPhoneNumber());
-        order.setAccesskey(driver.getAccessKey());
-        order.setDtype("1");
-        order.setBegin(begin_location);
-        order.setEnd(end_location);
-        order.setBegin_address(begin_location.getAddress());
-        order.setStop_address(stop_location.getAddress());
-        order.setEnd_address(end_location.getAddress());
-        order.setTicket_status("0");
-        order.setOrderdate(time.getText().toString());
-        order.setTarget(target);
-
-        sendDataRequest.putCreateQuickTaxiOrder(order);
-
-    }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -983,43 +975,47 @@ public class ClientTakeRideActivity extends Activity {
 
     private void provideOrderPrice()
     {
+
         if(dialog==null) {
-            dialog = new Dialog(ClientTakeRideActivity.this);
-            dialog.setContentView(R.layout.dialog_enter_order_price_layout);
-            dialog.setTitle(getString(R.string.order_change_fee));
-            TextView content = (TextView) dialog.findViewById(R.id.txt_msg);
-            final EditText enter = (EditText) dialog.findViewById(R.id.editText_password);
-            enter.setText("");
-            final EditText tip = (EditText) dialog.findViewById(R.id.editText_tip);
-            tip.setText("");
-            Button sure = (Button) dialog.findViewById(R.id.sure_action);
-            sure.setOnClickListener(new View.OnClickListener() {
+                dialog = new Dialog(ClientTakeRideActivity.this);
+                dialog.setContentView(R.layout.dialog_enter_order_price_layout);
+                dialog.setTitle(getString(R.string.order_change_fee));
+                TextView content = (TextView) dialog.findViewById(R.id.txt_msg);
+                final EditText enter = (EditText) dialog.findViewById(R.id.editText_password);
+                enter.setText("");
+                final EditText tip = (EditText) dialog.findViewById(R.id.editText_tip);
+                tip.setText("");
+                Button sure = (Button) dialog.findViewById(R.id.sure_action);
+                sure.setOnClickListener(new View.OnClickListener() {
 
-                @Override
-                public void onClick(View v) {
+                    @Override
+                    public void onClick(View v) {
 
-                    //if (option == TAKE_RIDE)
-                    //    if (departure_detail != null)
-                    //if (departure_detail.getLongitude()==0)
-                        parserAddressToGPS();
+                        //if (option == TAKE_RIDE)
+                        //    if (departure_detail != null)
+                        //if (departure_detail.getLongitude()==0)
+
+                            parserAddressToGPS();
                             createTaxiOrder("" + option, enter.getText().toString(), tip.getText().toString());
-                   //     else
-                   //         createTempTaxiOrder("" + option);
-                   // else
-                    //    createMechardiseOrder("" + option);
-                }
-            });
+                            //     else
+                            //         createTempTaxiOrder("" + option);
+                            // else
+                            //    createMechardiseOrder("" + option);
 
-            Button cancel = (Button) dialog.findViewById(R.id.cancel_action);
-            cancel.setOnClickListener(new View.OnClickListener() {
+                    }
+                });
 
-                @Override
-                public void onClick(View v) {
-                    dialog.cancel();
-                }
-            });
+                Button cancel = (Button) dialog.findViewById(R.id.cancel_action);
+                cancel.setOnClickListener(new View.OnClickListener() {
 
-            dialog.show();
+                    @Override
+                    public void onClick(View v) {
+                        dialog.cancel();
+                    }
+                });
+
+                dialog.show();
+
         }
     }
 
@@ -1114,14 +1110,16 @@ public class ClientTakeRideActivity extends Activity {
 
             //Log.e(TAG, "Stop zipCode:" + stop_locations.get(0).getPostalCode());
             stop_detail = new LocationAddress();
-            if (stop_locations.size() > 0) {
-                stop_detail.setLongitude(stop_locations.get(0).getLongitude());
-                stop_detail.setLatitude(stop_locations.get(0).getLatitude());
-                stop_detail.setAddress(stop);
-                stop_detail.setLocation(stop);
-                stop_detail.setCountryName(stop_locations.get(0).getCountryName());
-                stop_detail.setLocality(stop_locations.get(0).getLocality());
-                stop_detail.setZipCode(stop_locations.get(0).getPostalCode());
+            if(stop_locations!=null) {
+                if (stop_locations.size() > 0) {
+                    stop_detail.setLongitude(stop_locations.get(0).getLongitude());
+                    stop_detail.setLatitude(stop_locations.get(0).getLatitude());
+                    stop_detail.setAddress(stop);
+                    stop_detail.setLocation(stop);
+                    stop_detail.setCountryName(stop_locations.get(0).getCountryName());
+                    stop_detail.setLocality(stop_locations.get(0).getLocality());
+                    stop_detail.setZipCode(stop_locations.get(0).getPostalCode());
+                }
             }
         }
         String destination = destination_address.getText().toString();
@@ -1136,14 +1134,16 @@ public class ClientTakeRideActivity extends Activity {
 
 
             destination_detail = new LocationAddress();
-            if (destination_locations.size() > 0) {
-                destination_detail.setLongitude(destination_locations.get(0).getLongitude());
-                destination_detail.setLatitude(destination_locations.get(0).getLatitude());
-                destination_detail.setAddress(destination);
-                destination_detail.setLocation(destination);
-                destination_detail.setCountryName(destination_locations.get(0).getCountryName());
-                destination_detail.setLocality(destination_locations.get(0).getLocality());
-                destination_detail.setZipCode(destination_locations.get(0).getPostalCode());
+            if(destination_locations != null) {
+                if (destination_locations.size() > 0) {
+                    destination_detail.setLongitude(destination_locations.get(0).getLongitude());
+                    destination_detail.setLatitude(destination_locations.get(0).getLatitude());
+                    destination_detail.setAddress(destination);
+                    destination_detail.setLocation(destination);
+                    destination_detail.setCountryName(destination_locations.get(0).getCountryName());
+                    destination_detail.setLocality(destination_locations.get(0).getLocality());
+                    destination_detail.setZipCode(destination_locations.get(0).getPostalCode());
+                }
             }
         }
 
@@ -1159,9 +1159,9 @@ public class ClientTakeRideActivity extends Activity {
             departure_address_info = "從："+departure_address.getText().toString()+"\n";
         String stop_address_info;
         if(stop_detail!=null)
-            stop_address_info="停靠："+stop_detail.getAddress()+"\n";
+            stop_address_info="停："+stop_detail.getAddress()+"\n";
         else
-            stop_address_info = "停靠："+stop_address.getText().toString()+"\n";
+            stop_address_info = "停："+stop_address.getText().toString()+"\n";
 
         String destination_address_info;
         if(destination_detail!=null)
@@ -1197,14 +1197,142 @@ public class ClientTakeRideActivity extends Activity {
             spec = spec.substring(0,spec.length()-1)+"\n";
 
 
-        }
+        }else
+            spec = "特殊需求："+"\n";
 
         String markdetail="";
-        if(!remark.getText().toString().equals(""))
+        //if(!remark.getText().toString().equals(""))
             markdetail = "備註："+remark.getText().toString();
-
         Utility info = new Utility(this);
         AccountInfo user = info.getAccountInfo();
+
+        String data = "訂單類型:"+type+"\n"+"客戶電話:"+user.getPhoneNumber()+"\n"+orderType+departure_address_info+stop_address_info+destination_address_info+spec+markdetail;
+        if (option == ClientTakeRideActivity.SEND_MERCHANDISE) {
+            //貨物快遞需填寫收件人資訊
+            //if (dataType == Constants.APP_REGISTER_DRIVER_TYPE.K_REGISTER_DRIVER_TYPE_TAXI) {
+                //if (option == TAKE_RIDE) {
+                //if (departure_detail.getLongitude()==0)
+                if(dataType == Constants.APP_REGISTER_DRIVER_TYPE.K_REGISTER_DRIVER_TYPE_TAXI) {
+                    parserAddressToGPS();
+                    createTaxiOrder("" + option, "0", "0");
+                }else
+                    provideOrderPrice();
+                //}
+                //else
+                //   createMechardiseOrder("" + option);
+            //}
+        }else
+            confirmAlert(data);
+
+               /* }else
+                {
+                    NormalOrder order = createMechardiseOrder(""+SEND_MERCHANDISE);
+                    Intent question = new Intent(ClientTakeRideActivity.this, MerchandiseOrderActivity.class);
+                    Bundle b = new Bundle();
+                    b.putInt(Constants.ARG_POSITION, MerchandiseOrderActivity.SEND_MERCHANDISE);
+                    b.putSerializable(BUNDLE_ORDER_TICKET_ID, order);
+                    question.putExtras(b);
+                    startActivity(question);
+                }*/
+    }
+
+    private void choiceSpecFilter() {
+        //specData.clear();
+        LayoutInflater inflater = LayoutInflater.from(ClientTakeRideActivity.this);
+        View login_view = inflater.inflate(R.layout.client_take_ride_spec_item, null);
+        ListView lv = (ListView) login_view.findViewById(R.id.listviewicon);
+        Button btn_ok = (Button) login_view.findViewById(R.id.button_category_ok);
+        Button btn_cancel = (Button) login_view.findViewById(R.id.button_category_cancel);
+        btn_ok.setVisibility(View.VISIBLE);
+        btn_cancel.setVisibility(View.VISIBLE);
+        if (choiceSpecAlertDialog == null) {
+            choiceSpecAlertDialog = new AlertDialog.Builder(ClientTakeRideActivity.this).create();
+
+            //Resources res = getResources();
+            //final String[] status = res.getStringArray(R.array.client_take_ride_requirement);
+            // Change MyActivity.this and myListOfItems to your own values
+            if (listViewAdapter == null) {
+                getDataFromDB();
+                listViewAdapter = new ClientTakeRideSelectSpecListItemAdapter(ClientTakeRideActivity.this, 0, mCommentListData);
+                lv.setAdapter(listViewAdapter);
+            } else {
+                lv.setAdapter(listViewAdapter);
+                listViewAdapter.notifyDataSetChanged();
+            }
+
+            lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                public void onItemClick(AdapterView<?> a, View v, int position, long id) {
+                    ClientTakeRideSelectSpecListItem clientTakeRideSelectSpecListItem = mCommentListData.get(position);
+                    clientTakeRideSelectSpecListItem.check = !clientTakeRideSelectSpecListItem.check;
+                    if (clientTakeRideSelectSpecListItem.check) {
+                        if(!spec_list.contains(clientTakeRideSelectSpecListItem))
+                        {
+                            spec_list.add(clientTakeRideSelectSpecListItem);
+                        }
+                       // status_selectedItem = position;
+                    }else
+                        spec_list.remove(clientTakeRideSelectSpecListItem);
+
+                    mCommentListData.set(position, clientTakeRideSelectSpecListItem);
+                    /*for (int i = 0; i < mCommentListData.size(); i++) {
+                        if (i != position) {
+
+                            ClientTakeRideSelectSpecListItem clientTakeRideSelectSpecListItemOther = mCommentListData.get(i);
+
+                            clientTakeRideSelectSpecListItemOther.check = false;
+                            mCommentListData.set(i, clientTakeRideSelectSpecListItemOther);
+                        }
+
+                    }*/
+                    listViewAdapter.notifyDataSetChanged();
+                }
+            });
+            choiceSpecAlertDialog.setView(login_view);
+
+            btn_ok.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    //show_target_event_status.setText(status[status_selectedItem]);
+
+                    String content = "";
+                    for(int i = 0; i < spec_list.size(); i++)
+                    {
+                            content+=spec_list.get(i).book_title;
+                            if(i != spec_list.size() -1)
+                            content += ",";
+                    }
+
+                    Log.e(TAG,"Spec:"+content);
+                    spec_value.setText(content);
+                    choiceSpecAlertDialog.dismiss();
+                    choiceSpecAlertDialog = null;
+                }
+            });
+
+            btn_cancel.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    for(int i = 0; i < mCommentListData.size(); i++)
+                    {
+                        ClientTakeRideSelectSpecListItem clientTakeRideSelectSpecListItem = mCommentListData.get(i);
+                        clientTakeRideSelectSpecListItem.check = false;
+                        mCommentListData.set(i, clientTakeRideSelectSpecListItem);
+
+                    }
+                    listViewAdapter.notifyDataSetChanged();
+                    choiceSpecAlertDialog.dismiss();
+                    choiceSpecAlertDialog = null;
+                }
+            });
+
+            choiceSpecAlertDialog.setCancelable(false);
+            choiceSpecAlertDialog.show();
+        }
+
+    }
+
+
+    private void confirmAlert(String content)
+    {
+
 
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
                 this);
@@ -1214,7 +1342,7 @@ public class ClientTakeRideActivity extends Activity {
 
         // set dialog message
         alertDialogBuilder
-                .setMessage("訂單類型:"+type+"\n"+"客戶電話:"+user.getPhoneNumber()+"\n"+orderType+departure_address_info+stop_address_info+destination_address_info+spec+markdetail)
+                .setMessage(content)
                 .setCancelable(false)
                 .setPositiveButton(getString(R.string.cancel_take_spec), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
@@ -1226,12 +1354,12 @@ public class ClientTakeRideActivity extends Activity {
 
                         if (dataType == Constants.APP_REGISTER_DRIVER_TYPE.K_REGISTER_DRIVER_TYPE_TAXI) {
                             //if (option == TAKE_RIDE) {
-                                //if (departure_detail.getLongitude()==0)
-                                parserAddressToGPS();
-                                createTaxiOrder("" + option, "0", "0");
+                            //if (departure_detail.getLongitude()==0)
+                            parserAddressToGPS();
+                            createTaxiOrder("" + option, "0", "0");
                             //}
                             //else
-                             //   createMechardiseOrder("" + option);
+                            //   createMechardiseOrder("" + option);
                         }else
                         {
                             //讓使用者填入價錢和小費
@@ -1246,18 +1374,7 @@ public class ClientTakeRideActivity extends Activity {
 
         // show it
         alertDialog.show();
-               /* }else
-                {
-                    NormalOrder order = createMechardiseOrder(""+SEND_MERCHANDISE);
-                    Intent question = new Intent(ClientTakeRideActivity.this, MerchandiseOrderActivity.class);
-                    Bundle b = new Bundle();
-                    b.putInt(Constants.ARG_POSITION, MerchandiseOrderActivity.SEND_MERCHANDISE);
-                    b.putSerializable(BUNDLE_ORDER_TICKET_ID, order);
-                    question.putExtras(b);
-                    startActivity(question);
-                }*/
     }
-
     private void alert()
     {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
@@ -1277,4 +1394,47 @@ public class ClientTakeRideActivity extends Activity {
         // show it
         alertDialog.show();
     }
+
+    private void calculateMerchandiseUnit()
+    {
+
+        if(dialog==null) {
+            dialog = new Dialog(ClientTakeRideActivity.this);
+            //dialog.requestWindowFeature(Window.FEATURE_NO_TITLE); //before
+            dialog.setTitle(getString(R.string.unit_title));
+            dialog.setContentView(R.layout.dialog_enter_merchandise_unit_layout);
+
+            //TextView content = (TextView) dialog.findViewById(R.id.txt_msg);
+            final EditText unitLength = (EditText) dialog.findViewById(R.id.merchandise_content_length);
+
+            final EditText unitWidth = (EditText) dialog.findViewById(R.id.merchandise_content_width);
+            final EditText unitHigh = (EditText) dialog.findViewById(R.id.merchandise_content_high);
+
+
+            Button sure = (Button) dialog.findViewById(R.id.sure_action);
+            sure.setOnClickListener(new View.OnClickListener() {
+
+                @Override
+                public void onClick(View v) {
+
+                    double sum = Long.parseLong(unitLength.getText().toString()) * Long.parseLong(unitWidth.getText().toString()) *  Long.parseLong(unitHigh.getText().toString())/ 28317;
+                    merchandise_unit.setText(""+Math.round(sum)+" "+getString(R.string.unit_total_count));
+                    dialog.cancel();
+                    dialog = null;
+                }
+            });
+
+            Button cancel = (Button) dialog.findViewById(R.id.cancel_action);
+            cancel.setOnClickListener(new View.OnClickListener() {
+
+                @Override
+                public void onClick(View v) {
+                    dialog.cancel();
+                }
+            });
+
+        }
+        dialog.show();
+    }
+
 }

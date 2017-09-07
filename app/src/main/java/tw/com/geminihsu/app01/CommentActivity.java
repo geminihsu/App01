@@ -56,9 +56,9 @@ public class CommentActivity extends Activity {
         super.onStart();
         this.findViews();
         Utility info = new Utility(this);
-        //AccountInfo accountInfo = info.getAccountInfo();
+        AccountInfo accountInfo = info.getAccountInfo();
         //if(accountInfo!=null)
-        //    sendDataRequest.getAccountComment(accountInfo);
+         //   sendDataRequest.getAccountComment(accountInfo);
         getDataFromDB();
         listViewAdapter = new CommentListItemAdapter(CommentActivity.this, 0, mCommentListData);
         listView.setAdapter(listViewAdapter);

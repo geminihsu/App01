@@ -22,6 +22,8 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,6 +40,8 @@ import io.realm.RealmResults;
 import tw.com.geminihsu.app01.ClientTakeRideActivity;
 import tw.com.geminihsu.app01.R;
 import tw.com.geminihsu.app01.SupportAnswerActivity;
+import tw.com.geminihsu.app01.adapter.BeginOrderListItem;
+import tw.com.geminihsu.app01.adapter.BeginOrderListItemAdapter;
 import tw.com.geminihsu.app01.adapter.OrderRecordListItem;
 import tw.com.geminihsu.app01.adapter.OrderRecordListItemAdapter;
 import tw.com.geminihsu.app01.bean.AccountInfo;
@@ -45,16 +49,21 @@ import tw.com.geminihsu.app01.bean.NormalOrder;
 import tw.com.geminihsu.app01.common.Constants;
 import tw.com.geminihsu.app01.utils.JsonPutsUtil;
 import tw.com.geminihsu.app01.utils.RealmUtil;
+import tw.com.geminihsu.app01.utils.ThreadPoolUtil;
 import tw.com.geminihsu.app01.utils.Utility;
 
 public class Fragment_OrderRecord extends Fragment {
 
+    private final String TAG = Fragment_OrderRecord.class.toString();
     private ListView listView;
     private final List<OrderRecordListItem> mRecordOrderListData = new ArrayList<OrderRecordListItem>();;
     private OrderRecordListItemAdapter listViewAdapter;
 
 
     private JsonPutsUtil sendDataRequest;
+    private ArrayList<NormalOrder> orders;
+    private ProgressDialog progressDialog_loading;
+    private SwipeRefreshLayout loadOrderList;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -73,12 +82,12 @@ public class Fragment_OrderRecord extends Fragment {
 
     @Override
     public void onStart() {
-        sendDataRequest = new JsonPutsUtil(getActivity());
+
         super.onStart();
         this.findViews();
         setLister();
          //  getDataFromDB();
-        getOrderList();
+        //getOrderList();
         // 建立ListItemAdapter
         listViewAdapter = new OrderRecordListItemAdapter(getActivity(), 0, mRecordOrderListData);
         listView.setAdapter(listViewAdapter);
@@ -97,7 +106,24 @@ public class Fragment_OrderRecord extends Fragment {
     public void onResume() {
         getActivity().setTitle(getString(R.string.order_record_page_title));
         super.onResume();
+        if (progressDialog_loading==null) {
+            progressDialog_loading = ProgressDialog.show(getActivity(), "",
+                    "Loading. Please wait...", true);
+        }
+        //loadOrderList.setRefreshing(true);
 
+
+        //sendDataRequest.queryRecommendOrderList(info.getAccountInfo());
+        ThreadPoolUtil.getThreadPoolExecutor().execute((new Runnable(){
+            @Override
+            public void run() {
+                if(getActivity()!=null) {
+                    Utility info = new Utility(getActivity());
+                    info.clearData(NormalOrder.class);
+                    sendDataRequest.queryClientOrderList(info.getAccountInfo());
+                }
+            }
+        }));
 
     }
 
@@ -120,6 +146,7 @@ public class Fragment_OrderRecord extends Fragment {
     private void findViews() {
 
         listView = (ListView) getView().findViewById(R.id.listView1);
+        loadOrderList = (SwipeRefreshLayout) getView().findViewById(R.id.refreshlayout);
 
         // 設定所有view 的font size
         // View main_layout = (View) getView().findViewById(R.id.main_layout);
@@ -137,182 +164,153 @@ public class Fragment_OrderRecord extends Fragment {
 
             }
         });
+
+        loadOrderList.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+
+                /*progressDialog_loading = ProgressDialog.show(getActivity(), "",
+                        "Loading. Please wait...", true);*/
+                final Utility info = new Utility(getActivity());
+                info.clearData(NormalOrder.class);
+                //sendDataRequest.queryRecommendOrderList(info.getAccountInfo());
+                ThreadPoolUtil.getThreadPoolExecutor().execute((new Runnable(){
+                    @Override
+                    public void run() {
+                        if(getActivity()!=null) {
+                            Utility info = new Utility(getActivity());
+                            info.clearData(NormalOrder.class);
+                            sendDataRequest.queryClientOrderList(info.getAccountInfo());
+                        }
+                    }
+                }));
+
+            }
+        });
     }
 
+    @Override
+    public void onActivityCreated(Bundle bundle) {
+        super.onActivityCreated(bundle);
+        this.findViews();
+        orders = new ArrayList<NormalOrder>();
+        sendDataRequest = new JsonPutsUtil(getActivity());
 
-    /* 從 xml 取得 OrderRecord 清單 */
-    private void getDataFromDB() {
-        Bitmap bm1 = BitmapFactory.decodeResource(getResources(), R.drawable.ic_maps_local_taxi);
-        Bitmap bm2 = BitmapFactory.decodeResource(getResources(), R.drawable.ic_maps_local_airport);
-        Bitmap bm3 = BitmapFactory.decodeResource(getResources(), R.drawable.ic_maps_local_shipping);
+        sendDataRequest.setClientQueryOrderListManagerCallBackFunction(new JsonPutsUtil.ClientQueryOrderListManagerCallBackFunction() {
 
-        mRecordOrderListData.clear();
-        try {
-            // GeoDeviceManagement.deviceList = new ArrayList<UpnpSearchResultBean>();
-            // GeoDeviceManagement.deviceList.clear();
-            for (int i = 0; i < 10; i++) {
-
-                    if(i%3==0) {
-                           //Bitmap bm2 = BitmapFactory.decodeResource(getResources(), R.drawable.ic_online);
-                        OrderRecordListItem item = new OrderRecordListItem();
-                        item.image = bm1;
-                        item.order_status = "已取消";
-                        item.order_status_fontColor = getResources().getColor(R.color.bg_gray);
-                        item.time = "2015-12-18 上午07:04";
-                        item.departure = "從台中市台灣大段一段一號";
-                        item.destination = "到台中市政府";
-                        item.pay_method = "照表收費";
-                        item.car_status = "一般搭乘";
-                        mRecordOrderListData.add(item);
-
-                    }else if(i%3==1) {
-                         //Bitmap bm2 = BitmapFactory.decodeResource(getResources(), R.drawable.ic_online);
-                        OrderRecordListItem item = new OrderRecordListItem();
-                        item.image = bm2;
-                        item.order_status = "已完成";
-                        item.order_status_fontColor = getResources().getColor(R.color.address_devicename_txt);
-                        item.time = "2015-12-18 上午07:04";
-                        item.departure = "從台中市台灣大段一段一號";
-                        item.destination = "到台中市政府";
-                        item.pay_method = "照表收費";
-                        item.car_status = "";
-                        mRecordOrderListData.add(item);
-
-                    }
-                    else
-
-                    {
-                        //Bitmap bm2 = BitmapFactory.decodeResource(getResources(), R.drawable.ic_online);
-                        OrderRecordListItem item = new OrderRecordListItem();
-                        item.image = bm3;
-                        item.order_status = "進行中";
-                        item.order_status_fontColor = getResources().getColor(R.color.btn_bouns_upgrade);
-                        item.time = "2015-12-18 上午07:04";
-                        item.departure = "從台中市台灣大段一段一號";
-                        item.destination = "到台中市政府";
-                        item.pay_method = "$500";
-                        item.car_status = "";
-                        mRecordOrderListData.add(item);
-
-                    }
+            @Override
+            public void getWaitOrderListSuccess(RealmResults<NormalOrder> orders) {
+                if(progressDialog_loading!=null) {
+                    progressDialog_loading.dismiss();
+                    progressDialog_loading=null;
+                }
+                loadOrderList.setRefreshing(false);
+                getOrderList(orders);
+                listViewAdapter.notifyDataSetChanged();
             }
 
-        } catch (Throwable t) {
-            Toast.makeText(getActivity(), "Exception: " + t.toString(), Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    /* 從 xml 取得 OrderRecord 清單
-    private void getDataFromDB() {
-        Bitmap bm1 = BitmapFactory.decodeResource(getResources(), R.drawable.ic_maps_local_taxi);
-        Bitmap bm2 = BitmapFactory.decodeResource(getResources(), R.drawable.ic_maps_local_airport);
-        Bitmap bm3 = BitmapFactory.decodeResource(getResources(), R.drawable.ic_maps_local_shipping);
-
-        mRecordOrderListData.clear();
-        try {
-            // GeoDeviceManagement.deviceList = new ArrayList<UpnpSearchResultBean>();
-            // GeoDeviceManagement.deviceList.clear();
-            for (int i = 0; i < MAXSIZE; i++) {
-
-                if(i%3==0) {
-                    //Bitmap bm2 = BitmapFactory.decodeResource(getResources(), R.drawable.ic_online);
-                    OrderRecordListItem item = new OrderRecordListItem();
-                    item.image = bm1;
-                    item.order_status = "已取消";
-                    item.order_status_fontColor = getResources().getColor(R.color.bg_gray);
-                    item.time = "2015-12-18 上午07:04";
-                    item.departure = "從台中市台灣大段一段一號";
-                    item.destination = "到台中市政府";
-                    item.pay_method = "照表收費";
-                    item.car_status = "一般搭乘";
-                    mRecordOrderListData.add(item);
-
-                }else if(i%3==1) {
-                    //Bitmap bm2 = BitmapFactory.decodeResource(getResources(), R.drawable.ic_online);
-                    OrderRecordListItem item = new OrderRecordListItem();
-                    item.image = bm2;
-                    item.order_status = "已完成";
-                    item.order_status_fontColor = getResources().getColor(R.color.address_devicename_txt);
-                    item.time = "2015-12-18 上午07:04";
-                    item.departure = "從台中市台灣大段一段一號";
-                    item.destination = "到台中市政府";
-                    item.pay_method = "照表收費";
-                    item.car_status = "";
-                    mRecordOrderListData.add(item);
-
+            @Override
+            public void getOrderListSuccess(RealmResults<NormalOrder> orders) {
+                if(progressDialog_loading!=null) {
+                    progressDialog_loading.dismiss();
+                    progressDialog_loading=null;
                 }
-                else
+                //getDataFromServer(orders,option);
+                listViewAdapter.notifyDataSetChanged();
+            }
 
+            @Override
+            public void getOrderListFail(boolean error,String message) {
+                if(error)
                 {
-                    //Bitmap bm2 = BitmapFactory.decodeResource(getResources(), R.drawable.ic_online);
-                    OrderRecordListItem item = new OrderRecordListItem();
-                    item.image = bm3;
-                    item.order_status = "進行中";
-                    item.order_status_fontColor = getResources().getColor(R.color.btn_bouns_upgrade);
-                    item.time = "2015-12-18 上午07:04";
-                    item.departure = "從台中市台灣大段一段一號";
-                    item.destination = "到台中市政府";
-                    item.pay_method = "$500";
-                    item.car_status = "";
-                    mRecordOrderListData.add(item);
+                    loadOrderList.setRefreshing(false);
+                    if(progressDialog_loading!=null) {
+                        progressDialog_loading.dismiss();
+                        progressDialog_loading=null;
+                    }
+                    if(message.equals("836"))
+                    {
+                        Utility info = new Utility(getActivity());
+                        if(info.getAccountInfo().getDriver_type().equals("0"))
+                            Toast.makeText(getActivity(), "目前暫停營業中", Toast.LENGTH_LONG).show();
+                        else
+                            Toast.makeText(getActivity(), "司機身份已送出審核", Toast.LENGTH_LONG).show();
 
+                    }
                 }
             }
+        });
 
-        } catch (Throwable t) {
-            Toast.makeText(getActivity(), "Exception: " + t.toString(), Toast.LENGTH_SHORT).show();
-        }
-    }*/
+    }
 
-    /* 從 xml 取得 OrderRecord 清單 */
-    private void getOrderList() {
+    private void getOrderList(RealmResults<NormalOrder> orders) {
         Bitmap bm1 = BitmapFactory.decodeResource(getResources(), R.drawable.ic_maps_local_taxi);
         Bitmap bm2 = BitmapFactory.decodeResource(getResources(), R.drawable.ic_maps_local_airport);
         Bitmap bm3 = BitmapFactory.decodeResource(getResources(), R.drawable.ic_maps_local_shipping);
 
-        Utility orders = new Utility(getActivity());
-        RealmResults<NormalOrder> data=orders.getAccountOrderList();
 
         mRecordOrderListData.clear();
         try {
             // GeoDeviceManagement.deviceList = new ArrayList<UpnpSearchResultBean>();
             // GeoDeviceManagement.deviceList.clear();
-            for (NormalOrder order : data) {
+            for (NormalOrder order : orders) {
 
 
-                    //Bitmap bm2 = BitmapFactory.decodeResource(getResources(), R.drawable.ic_online);
-                    OrderRecordListItem item = new OrderRecordListItem();
-                    Constants.APP_REGISTER_DRIVER_TYPE type = Constants.conversion_register_driver_account_result(Integer.valueOf(order.getDtype()));
-                    if(type.equals(Constants.APP_REGISTER_DRIVER_TYPE.K_REGISTER_DRIVER_TYPE_CARGO))
-                    {
-                        item.image = bm3;
-                        item.pay_method = "$"+order.getPrice()+"元";
-                        item.car_status = "";
-                    }
-                    else if(type.equals(Constants.APP_REGISTER_DRIVER_TYPE.K_REGISTER_DRIVER_TYPE_TAXI)) {
-                        item.image = bm1;
-                        item.pay_method = "跳錶收費";
-                        item.car_status = "一般搭乘";
-                        item.car_status_Visibility = View.VISIBLE;
-                    }
+                //Bitmap bm2 = BitmapFactory.decodeResource(getResources(), R.drawable.ic_online);
+                OrderRecordListItem item = new OrderRecordListItem();
+                Constants.APP_REGISTER_DRIVER_TYPE Dtype = Constants.conversion_register_driver_account_result(Integer.valueOf(order.getDtype()));
+                Log.e(TAG,"type:"+Dtype.value());
+                //Constants.APP_REGISTER_ORDER_TYPE order_type = Constants.conversion_create_new_order_cargo_type_result(Integer.valueOf(order.getDtype()));
 
-                    if(order.getTicket_status().equals("0"))
-                       item.order_status = "配對中";
-                    else
-                    if(order.getTicket_status().equals("1"))
-                       item.order_status = "進行中";
-                    else
-                    if(order.getTicket_status().equals("2"))
-                        item.order_status = "已完成";
+
+                if(Dtype.equals(Constants.APP_REGISTER_DRIVER_TYPE.K_REGISTER_DRIVER_TYPE_TAXI)||Dtype.equals(Constants.APP_REGISTER_DRIVER_TYPE.K_REGISTER_DRIVER_TYPE_UBER)) {
+                    item.image = bm1;
+                    //item.car_status = "一般搭乘";
+                    item.car_status_Visibility = View.VISIBLE;
+                }else
+                if(Dtype.equals(Constants.APP_REGISTER_DRIVER_TYPE.K_REGISTER_DRIVER_TYPE_CARGO)||Dtype.equals(Constants.APP_REGISTER_DRIVER_TYPE.K_REGISTER_DRIVER_TYPE_TRUCK)||Dtype.equals(Constants.APP_REGISTER_DRIVER_TYPE.K_REGISTER_DRIVER_TYPE_TRAILER))
+                {
+                    item.image = bm3;
+                    item.pay_method = "$"+order.getPrice()+"元";
+                    item.car_status = "";
+                }
+                if(order.getPrice().equals("0"))
+                    item.pay_method = "跳錶收費";
+                else
+                    item.pay_method = "價錢 $" + order.getPrice() +"元,小費 $ " + order.getTip()+"元";
+
+
+                if(order.getTicket_status().equals("0"))
+                    item.order_status = "等待中";
+                else
+                if(order.getTicket_status().equals("1"))
+                    item.order_status = "進行中";
+                else
+                if(order.getTicket_status().equals("100"))
+                    item.order_status = "已結案";
 
 
                 item.order_status_fontColor = getResources().getColor(R.color.btn_bouns_upgrade);
+                if(order.getTimebegin().equals("0"))
+                    item.time = "即時";
+                else
                     item.time = order.getOrderdate();
-                    item.departure = "從:"+order.getBegin_address();
-                    item.destination = "到:"+order.getEnd_address();
-                    item.normalOrder = order;
-                    //item.car_status = "";
-                    mRecordOrderListData.add(item);
+                item.departure = "從:"+order.getBegin_address();
+                item.destination = "到:"+order.getEnd_address();
+                item.normalOrder = order;
+
+                Constants.APP_REGISTER_ORDER_TYPE type = Constants.conversion_create_new_order_cargo_type_result(Integer.valueOf(order.getCargo_type()));
+                if (type.equals(Constants.APP_REGISTER_ORDER_TYPE.K_REGISTER_ORDER_TYPE_SEND_MERCHANDISE)) {
+                    item.car_status = "貨物快送";
+                } else if (type.equals(Constants.APP_REGISTER_ORDER_TYPE.K_REGISTER_ORDER_TYPE_TAKE_RIDE)) {
+                    item.car_status = "一般搭乘";
+                } else if (type.equals(Constants.APP_REGISTER_ORDER_TYPE.K_REGISTER_ORDER_TYPE_PICK_UP_AIRPORT)) {
+                    item.car_status = "機場接送";
+                } else if (type.equals(Constants.APP_REGISTER_ORDER_TYPE.K_REGISTER_ORDER_TYPE_PICK_UP_TRAIN)) {
+                    item.car_status = "車站接送";
+                }
+                //item.car_status = "";
+                mRecordOrderListData.add(item);
 
             }
 

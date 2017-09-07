@@ -16,4 +16,8 @@
     <color name="bg_light_gray">#F0F0F0</color>
     <color name="transparent">#00000000</color>
     <color name="sender_comment">#1904f9</color>
+    <color name="filter_pop_list_txt_color">#4c4c4c</color>
+    <color name="filter_pop_list_divider_color">#dfe7f0</color>
+    <color name="filter_pop_list_button_txt_color">#0099cc</color>
+
 </resources>

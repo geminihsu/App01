@@ -24,6 +24,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.android.gms.plus.Account;
 import com.google.firebase.iid.FirebaseInstanceId;
 //import com.newrelic.agent.android.Agent;
 //import com.newrelic.agent.android.NewRelic;
@@ -1019,9 +1020,19 @@ public class JsonPutsUtil {
                     } else if (connectResult.equals(App01libObjectKey.APP_GET_PUSH_RESPONSE_CODE.K_APP_GET_PUSH_CODE_ACCOUNT_EXPIRED))
                     {
                       //發現驗證失敗，所以重新登入
-                        sendLoginRequest(user,false);
+                       //sendLoginRequest(user,false);
+                        String message = jsonObject.getString(App01libObjectKey.APP_OBJECT_KEY_DEVICE_INFO_MESSAGE);
 
-                    } else {
+                        Utility info = new Utility(mContext);
+                        info.clearData(AccountInfo.class);
+                        info.clearData(AccountTreeInfo.class);
+
+                        if (mClientOrderHasBeenTakenOVerManagerCallBackFunction!=null) {
+                            mClientOrderHasBeenTakenOVerManagerCallBackFunction.accountExpired(false,message);
+                        }
+
+
+                        } else {
                         String message = jsonObject.getString(App01libObjectKey.APP_OBJECT_KEY_DEVICE_INFO_MESSAGE);
 
                         Toast.makeText(mContext,
@@ -1271,7 +1282,7 @@ public class JsonPutsUtil {
     }
 
     //查詢客戶訂單
-    public void queryClientOrderList(AccountInfo user) {
+    public void queryClientOrderList(final AccountInfo user) {
 
         //final RequestQueue requestQueue = Volley.newRequestQueue(mContext);
 
@@ -1293,16 +1304,87 @@ public class JsonPutsUtil {
                     // Parsing json object response
                     // response will be a json object
                     String status = jsonObject.getString(App01libObjectKey.APP_OBJECT_KEY_ACCOUNT_INFO_STATUS);
-                    App01libObjectKey.APP_GET_PUSH_RESPONSE_CODE connectResult = App01libObjectKey.conversion_get_put_notification_result(Integer.valueOf(status));
+                    App01libObjectKey.APP_QUERY_ORDER_RESPONSE_CODE connectResult = App01libObjectKey.conversion_get_client_order_record_result(Integer.valueOf(status));
 
-                    if (connectResult.equals(App01libObjectKey.APP_GET_PUSH_RESPONSE_CODE.K_APP_GET_PUSH_CODE_SUCCESS)) {
+                    if (connectResult.equals(App01libObjectKey.APP_QUERY_ORDER_RESPONSE_CODE.K_APP_QUERY_ORDER_CODE_SUCCESS)) {
                         Log.e(TAG, "get push!!!!");
-                    } else {
-                        String message = jsonObject.getString(App01libObjectKey.APP_OBJECT_KEY_DEVICE_INFO_MESSAGE);
+                        String datas = jsonObject.optString(App01libObjectKey.APP_OBJECT_KEY_NOTIFICATION_INFO_MESSAGE);
+                        ArrayList<String> ticketList = new ArrayList<String>();
+                        RealmUtil database = new RealmUtil(mContext);
+                        RealmResults<ServerBookmark> location =database.queryServerBookmark();
+                        if(datas.equals("null"))
+                        {
+                            if (mClientQueryOrderListManagerCallBackFunction !=null)
+                                mClientQueryOrderListManagerCallBackFunction.getOrderListFail(true,status);
+                        }else{
+                            JSONArray info = jsonObject.getJSONArray(App01libObjectKey.APP_OBJECT_KEY_NOTIFICATION_INFO_MESSAGE);
+                            String queryId="";
+                            ArrayList<NormalOrder> orderList = new ArrayList<NormalOrder>();
+                            for (int i = 0; i < info.length(); i++){
+                                JSONObject object = info.getJSONObject(i);
+                                String id = object.getString(App01libObjectKey.APP_OBJECT_KEY_NOTIFICATION_ID);
+                                ticketList.add(id);
 
-                        Toast.makeText(mContext,
-                                message,
-                                Toast.LENGTH_LONG).show();
+                                /*NormalOrder order = new NormalOrder();
+                                //取得訂單詳細資料
+                                String ticket_id = object.getString(App01libObjectKey.APP_OBJECT_KEY_NOTIFICATION_ID);
+                                String uid = object.getString(App01libObjectKey.APP_OBJECT_KEY_CLIENT_UID);
+                                String dtype = object.getString(App01libObjectKey.APP_OBJECT_KEY_ORDER_TYPE);
+                                String cargo_type = object.getString(App01libObjectKey.APP_OBJECT_KEY_ORDER_CARGO_TYPE);
+                                String price = object.getString(App01libObjectKey.APP_OBJECT_KEY_ORDER_PRICE);
+                                String tip = object.getString(App01libObjectKey.APP_OBJECT_KEY_ORDER_TIP);
+
+                                order.setTicket_id(ticket_id);
+                                order.setUser_uid(uid);
+                                order.setDtype(dtype);
+                                order.setUser_name(user.getPhoneNumber());
+                                order.setUser_id(user.getId());
+                                order.setCargo_type(cargo_type);
+                                order.setAccesskey(user.getAccessKey());
+                                order.setPrice(price);
+                                order.setTip(tip);
+                                order.setTicket_status("0");
+
+                                ServerBookmark bookmark= location.get(i%2);
+                                //以下欄位做假資料
+                                order.setTarget("1");
+                                OrderLocationBean begin = new OrderLocationBean();
+                                begin.setZipcode("100");
+                                begin.setLatitude(bookmark.getLat());
+                                begin.setLongitude(bookmark.getLng());
+                                begin.setAddress(bookmark.getLocation());
+                                order.setBegin(begin);
+                                order.setBegin_address(bookmark.getStreetAddress());
+
+                                ServerBookmark bookmark1= location.get(i%3);
+                                OrderLocationBean end = new OrderLocationBean();
+                                end.setZipcode("320");
+                                end.setLatitude(bookmark1.getLat());
+                                end.setLongitude(bookmark1.getLat());
+                                end.setAddress(bookmark1.getLocation());
+                                order.setEnd(end);
+                                order.setEnd_address(bookmark1.getStreetAddress());
+                                Date dateIfo=new Date();
+                                order.setOrderdate(new SimpleDateFormat("yyyy/MM/dd  HH:mm:ss").format(dateIfo));
+                                orderList.add(order);*/
+                            }
+                            //if (mDriverRecommendationOrderListManagerCallBackFunction !=null)
+                            //  mDriverRecommendationOrderListManagerCallBackFunction.getOrderListSuccess(orderList);
+
+
+                            Log.e(TAG,"ticketList size:"+ticketList.size());
+                            //查詢訂單明細
+                            getRecommendationTicketInfo(user,ticketList);
+                        }
+                    } else {
+                        if (mClientQueryOrderListManagerCallBackFunction !=null)
+                            mClientQueryOrderListManagerCallBackFunction.getOrderListFail(true,status);
+
+                        //String message = jsonObject.getString(App01libObjectKey.APP_OBJECT_KEY_DEVICE_INFO_MESSAGE);
+
+                        //Toast.makeText(mContext,
+                        //        message,
+                        //      Toast.LENGTH_LONG).show();
 
                     }
 
@@ -2012,7 +2094,7 @@ public class JsonPutsUtil {
                                 order.setAccesskey(user.getAccessKey());
                                 order.setPrice(price);
                                 order.setTip(tip);
-                                order.setTicket_status("0");
+                                //order.setTicket_status("0");
 
                                 Date dateIfo=new Date();
                                 order.setOrderdate(new SimpleDateFormat("yyyy/MM/dd  HH:mm:ss").format(dateIfo));
@@ -2034,6 +2116,12 @@ public class JsonPutsUtil {
                                     if (data.size() > 0) {
                                         if (mDriverRecommendationOrderListManagerCallBackFunction != null)
                                             mDriverRecommendationOrderListManagerCallBackFunction.getWaitOrderListSuccess(data);
+
+                                    }
+
+                                    if (data.size() > 0) {
+                                        if (mClientQueryOrderListManagerCallBackFunction != null)
+                                            mClientQueryOrderListManagerCallBackFunction.getWaitOrderListSuccess(data);
 
                                     }
                                 }
@@ -2776,7 +2864,7 @@ public class JsonPutsUtil {
             obj.put(App01libObjectKey.APP_OBJECT_KEY_PUTS_METHOD, App01libObjectKey.APP_OBJECT_KEY_PUTS_ACCOUNT_COMMENT);
             obj.put(App01libObjectKey.APP_OBJECT_KEY_LOGIN_USERNAME, accountInfo.getPhoneNumber());
             obj.put(App01libObjectKey.APP_OBJECT_KEY_DEVICE_INFO_ACCESSKEY, accountInfo.getAccessKey());
-            obj.put(App01libObjectKey.APP_OBJECT_KEY_UID, Integer.valueOf(accountInfo.getUid()));
+            obj.put(App01libObjectKey.APP_OBJECT_KEY_UID, Integer.valueOf(accountInfo.getId()));
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -4060,7 +4148,7 @@ public class JsonPutsUtil {
         final JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST,Constants.SERVER_URL,obj,new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject jsonObject) {
-                Log.e(TAG,"[sendGetServerContentDetail]:"+jsonObject.toString());
+                Log.e(TAG,"[sendCustomerGainBound]:"+jsonObject.toString());
 
                 try {
                     // Parsing json object response
@@ -4283,7 +4371,24 @@ public class JsonPutsUtil {
 
     }
 
+
     public interface DriverRecommendationOrderListManagerCallBackFunction {
+        public void getWaitOrderListSuccess(RealmResults<NormalOrder> data);
+        public void getOrderListSuccess(RealmResults<NormalOrder> data);
+        public void getOrderListFail(boolean error,String message);
+
+    }
+
+    //查詢客戶訂單callback
+    private ClientQueryOrderListManagerCallBackFunction mClientQueryOrderListManagerCallBackFunction;
+
+    public void setClientQueryOrderListManagerCallBackFunction(ClientQueryOrderListManagerCallBackFunction clientQueryOrderListManagerCallBackFunction) {
+        mClientQueryOrderListManagerCallBackFunction = clientQueryOrderListManagerCallBackFunction;
+
+    }
+
+
+    public interface ClientQueryOrderListManagerCallBackFunction {
         public void getWaitOrderListSuccess(RealmResults<NormalOrder> data);
         public void getOrderListSuccess(RealmResults<NormalOrder> data);
         public void getOrderListFail(boolean error,String message);
@@ -4301,6 +4406,7 @@ public class JsonPutsUtil {
     public interface ClientOrderHasBeenTakenOVerManagerCallBackFunction {
         public void getOrderTakenSuccess(String ticket_id,String message,String driverUid);
         public void getOrderFinishSuccess(String ticket_id,String message);
+        public void accountExpired(boolean expired, String err);
 
     }
 

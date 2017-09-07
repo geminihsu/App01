@@ -387,11 +387,33 @@ public class App01libObjectKey {
         K_APP_GET_PUSH_CODE_ACCOUNT_NO_SMS_VERIFY(704),
         K_APP_GET_PUSH_CODE_ACCOUNT_NO_EXSIT (701),
         K_APP_GET_PUSH_CODE_ACCOUNT_NOT_DRIVER (9301),
-        K_APP_GET_PUSH_CODE_ENTER_ERROR (900);
+        K_APP_GET_PUSH_CODE_ENTER_ERROR (900),
+        K_APP_GET_PUSH_CODE_ACCOUNT_VERIFY_ERROR(903);
 
         private int value;
 
         private APP_GET_PUSH_RESPONSE_CODE(int value) {
+            this.value = value;
+        }
+
+        public int value() {
+            return value;
+        }
+    };
+
+
+    public enum APP_QUERY_ORDER_RESPONSE_CODE
+    {
+        K_APP_QUERY_ORDER_CODE_SUCCESS (100)  ,
+        K_APP_QUERY_ORDER_CODE_ACCOUNT_EXPIRED (708),
+        K_APP_QUERY_ORDER_CODE_ACCOUNT_NO_SMS_VERIFY(704),
+        K_APP_QUERY_ORDER_CODE_ACCOUNT_NO_EXSIT (701),
+        K_APP_QUERY_ORDER_CODE_FORMAT_ERROR (903),
+        K_APP_QUERY_ORDER_NO_ORDER_ERROR (804);
+
+        private int value;
+
+        private APP_QUERY_ORDER_RESPONSE_CODE(int value) {
             this.value = value;
         }
 
@@ -775,9 +797,39 @@ public class App01libObjectKey {
                 return APP_GET_PUSH_RESPONSE_CODE.K_APP_GET_PUSH_CODE_ENTER_ERROR;
             }
 
+            if (index == 903 ) {
+                return APP_GET_PUSH_RESPONSE_CODE.K_APP_GET_PUSH_CODE_ACCOUNT_VERIFY_ERROR;
+            }
+
             if (index == 9301) {
                 return APP_GET_PUSH_RESPONSE_CODE.K_APP_GET_PUSH_CODE_ACCOUNT_NOT_DRIVER;
             }
+        }
+        return null;
+    }
+
+    public static APP_QUERY_ORDER_RESPONSE_CODE conversion_get_client_order_record_result(int index) {
+        if (index >= 0) {
+            if (index == 100) {
+                return APP_QUERY_ORDER_RESPONSE_CODE.K_APP_QUERY_ORDER_CODE_SUCCESS;
+            }
+            if (index == 840) {
+                return APP_QUERY_ORDER_RESPONSE_CODE.K_APP_QUERY_ORDER_NO_ORDER_ERROR;
+            }
+            if (index == 701) {
+                return APP_QUERY_ORDER_RESPONSE_CODE.K_APP_QUERY_ORDER_CODE_ACCOUNT_NO_EXSIT;
+            }
+            if (index == 704) {
+                return APP_QUERY_ORDER_RESPONSE_CODE.K_APP_QUERY_ORDER_CODE_ACCOUNT_NO_SMS_VERIFY;
+            }
+            if (index == 903) {
+                return APP_QUERY_ORDER_RESPONSE_CODE.K_APP_QUERY_ORDER_CODE_FORMAT_ERROR;
+            }
+            if (index == 708) {
+                return APP_QUERY_ORDER_RESPONSE_CODE.K_APP_QUERY_ORDER_CODE_ACCOUNT_EXPIRED;
+            }
+
+
         }
         return null;
     }

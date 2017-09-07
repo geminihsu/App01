@@ -45,6 +45,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -108,6 +109,7 @@ public class Fragment_Client_Service_test extends Fragment  implements LocationL
     private ImageButton send_merchandise;
     private ImageButton air_plane;
     private ImageButton train;
+    private TextView text_taxi_oneKey;
 
     private MapView mapView;
     private GoogleMap googleMap;
@@ -391,6 +393,8 @@ public class Fragment_Client_Service_test extends Fragment  implements LocationL
         air_plane = (ImageButton) getView().findViewById(R.id.airplane);
         train = (ImageButton) getView().findViewById(R.id.train);
 
+        text_taxi_oneKey = (TextView) getView().findViewById(R.id.txt_taxi_truck);
+
     }
 
     @Override
@@ -416,7 +420,8 @@ public class Fragment_Client_Service_test extends Fragment  implements LocationL
                  //linearLayout_send_merchandise.setVisibility(View.GONE);
                  dataType = Constants.APP_REGISTER_DRIVER_TYPE.K_REGISTER_DRIVER_TYPE_TAXI;
                  isShowOneKey = true;
-                 getActivity().invalidateOptionsMenu();
+                 //getActivity().invalidateOptionsMenu();
+                 text_taxi_oneKey.setText(getString(R.string.order_call_taxi_page_title));
              }
          });
 
@@ -425,6 +430,7 @@ public class Fragment_Client_Service_test extends Fragment  implements LocationL
              @Override
              public void onClick(View v) {
                  linearLayout_taxi_service.setVisibility(View.VISIBLE);
+                 linearLayout_send_merchandise.setVisibility(View.GONE);
                  linearLayout_client_service.setVisibility(View.GONE);
                  dataType = Constants.APP_REGISTER_DRIVER_TYPE.K_REGISTER_DRIVER_TYPE_UBER;
 
@@ -499,7 +505,12 @@ public class Fragment_Client_Service_test extends Fragment  implements LocationL
              @Override
              public void onClick(View v) {
                 // if (dataType == Constants.APP_REGISTER_DRIVER_TYPE.K_REGISTER_DRIVER_TYPE_UBER) {
-                     orderCargoType =  Constants.APP_REGISTER_ORDER_TYPE.K_REGISTER_ORDER_TYPE_SEND_MERCHANDISE;
+
+                 if(isShowOneKey)
+                 {
+                     createQuickTaxiOrder();
+                 }else {
+                     orderCargoType = Constants.APP_REGISTER_ORDER_TYPE.K_REGISTER_ORDER_TYPE_SEND_MERCHANDISE;
 
 
                      Intent question = new Intent(getActivity(), ClientTakeRideActivity.class);
@@ -521,6 +532,7 @@ public class Fragment_Client_Service_test extends Fragment  implements LocationL
 
                      transaction.commit();
                  }*/
+                 }
              }
          });
          air_plane.setOnClickListener(new View.OnClickListener() {
@@ -638,7 +650,7 @@ public class Fragment_Client_Service_test extends Fragment  implements LocationL
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        MenuItem item = menu.add(Menu.NONE, ACTIONBAR_MENU_ITEM_FIILTER, Menu.NONE, getString(R.string.order_call_taxi_page_title));
+        /*MenuItem item = menu.add(Menu.NONE, ACTIONBAR_MENU_ITEM_FIILTER, Menu.NONE, getString(R.string.order_call_taxi_page_title));
         SpannableString spanString = new SpannableString(item.getTitle().toString());
         spanString.setSpan(new ForegroundColorSpan(Color.WHITE), 0, spanString.length(), 0); //fix the color to white
         item.setTitle(spanString);
@@ -648,7 +660,7 @@ public class Fragment_Client_Service_test extends Fragment  implements LocationL
             item.setVisible(true);
         else
             item.setVisible(false);
-        item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+        item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);*/
         super.onCreateOptionsMenu(menu,inflater);
     }
 

@@ -53,8 +53,8 @@ public class Fragment_BeginOrder extends Fragment {
         setHasOptionsMenu(true);
         mTabNamesList = new ArrayList<>();
         mTabNamesList.add(getString(R.string.tab_real_time));
-        mTabNamesList.add(getString(R.string.tab_reservation));
-        mTabNamesList.add(getString(R.string.tab_company));
+        //mTabNamesList.add(getString(R.string.tab_reservation));
+        //mTabNamesList.add(getString(R.string.tab_company));
 
     }
 
