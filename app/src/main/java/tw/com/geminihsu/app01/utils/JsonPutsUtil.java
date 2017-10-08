@@ -1688,7 +1688,7 @@ public class JsonPutsUtil {
     }
 
     // 訂單-取消訂單
-    public void clientCancelOrder(final NormalOrder order,String driverPhoneNumber) {
+    public void clientCancelOrder(final NormalOrder order) {
 
         //final RequestQueue requestQueue = Volley.newRequestQueue(mContext);
 
@@ -1696,7 +1696,7 @@ public class JsonPutsUtil {
 
         try {
             obj.put(App01libObjectKey.APP_OBJECT_KEY_PUTS_METHOD, App01libObjectKey.APP_OBJECT_KEY_PUTS_CUSTOMER_CANCEL_ORDER);
-            obj.put(App01libObjectKey.APP_OBJECT_KEY_LOGIN_USERNAME, driverPhoneNumber);
+            obj.put(App01libObjectKey.APP_OBJECT_KEY_LOGIN_USERNAME, order.getUser_name());
             obj.put(App01libObjectKey.APP_OBJECT_KEY_DEVICE_INFO_ACCESSKEY, order.getAccesskey());
             obj.put(App01libObjectKey.APP_OBJECT_KEY_DRIVER_TICKET_ID, Integer.valueOf(order.getTicket_id()));
 
@@ -1877,7 +1877,7 @@ public class JsonPutsUtil {
     }
 
     //查詢訂單明細
-    public void queryOrderInformation(final AccountInfo user, final String orderId, final boolean max) {
+    public void queryOrderInformation(final AccountInfo user, final String orderId, final int ticketLen) {
 
         //final RequestQueue requestQueue = Volley.newRequestQueue(mContext);
 
@@ -2108,23 +2108,23 @@ public class JsonPutsUtil {
                                 }
 
 
-                                if(max) {
+                                //if(max) {
                                     Utility orders = new Utility(mContext);
                                     //orders.clearData(NormalOrder.class);
                                     RealmResults<NormalOrder> data=orders.getRecommendationOrderList();
 
-                                    if (data.size() > 0) {
+                                    if (data.size() == ticketLen) {
                                         if (mDriverRecommendationOrderListManagerCallBackFunction != null)
                                             mDriverRecommendationOrderListManagerCallBackFunction.getWaitOrderListSuccess(data);
 
                                     }
 
-                                    if (data.size() > 0) {
+                                    if (data.size()  == ticketLen) {
                                         if (mClientQueryOrderListManagerCallBackFunction != null)
                                             mClientQueryOrderListManagerCallBackFunction.getWaitOrderListSuccess(data);
 
                                     }
-                                }
+                               // }
                                 /*ServerBookmark bookmark= location.get(i%2);
                                 //以下欄位做假資料
                                 order.setTarget("1");
@@ -4498,16 +4498,12 @@ public class JsonPutsUtil {
 
 
     private void getRecommendationTicketInfo(AccountInfo user,ArrayList<String> ticketList) {
-        ArrayList<NormalOrder> orderList = new ArrayList<NormalOrder>();
-        boolean isEnd = false;
         Utility orders = new Utility(mContext);
         orders.clearData(NormalOrder.class);
         for (int i = 0; i < ticketList.size(); i++) {
 
             String ticket_no = ticketList.get(i);
-            if (i == ticketList.size() - 1)
-                isEnd = true;
-            queryOrderInformation(user, ticket_no, isEnd);
+            queryOrderInformation(user, ticket_no, ticketList.size());
         }
     }
 

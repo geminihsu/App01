@@ -534,7 +534,7 @@ public class OrderProcesssActivity extends Activity implements LocationListener 
                                 b.putInt(Constants.ARG_POSITION, Constants.CANCEL_ORDER_FEEDBACK);
                                 question.putExtras(b);
                                 startActivity(question);*/
-                                sendDataRequest.clientCancelOrder(order,driverPhoneNumber);
+                                sendDataRequest.clientCancelOrder(order);
 
                             }
                         })

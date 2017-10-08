@@ -7,6 +7,7 @@ import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.app.TimePickerDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
@@ -21,6 +22,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -456,142 +458,7 @@ public class ClientTakeRideActivity extends Activity {
             }
         });
 
-        /*getDataFromDB();
-        linearLayout_spec.setOnClickListener(new View.OnClickListener() {
 
-            @Override
-            public void onClick(View v) {
-                // custom dialog
-                final Dialog dialog = new Dialog(ClientTakeRideActivity.this);
-                dialog.setContentView(R.layout.client_take_ride_selectspec_requirement);
-                dialog.setTitle(getString(R.string.txt_take_spec));
-                Button cancel = (Button) dialog.findViewById(R.id.button_category_cancel);
-                Button ok = (Button) dialog.findViewById(R.id.button_category_ok);
-
-                //dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-                // set the custom dialog components - text, image and button
-                ListView requirement = (ListView) dialog.findViewById(R.id.listViewDialog);
-
-                requirement.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-
-                        ClientTakeRideSelectSpecListItemAdapter adapter = (ClientTakeRideSelectSpecListItemAdapter) parent.getAdapter();
-                        ClientTakeRideSelectSpecListItem c = (ClientTakeRideSelectSpecListItem) adapter.getItem(position);
-                        c.check = !c.check;
-                        //ClientTakeRideSelectSpecListItem item = mCommentListData.get(position);
-                        //item.check= !item.check;
-                        //mCommentListData.set(position,item);
-                        listViewAdapter.notifyDataSetChanged();
-                    }
-                });
-
-                if(listViewAdapter == null) {
-                    //getDataFromDB();
-                    listViewAdapter = new ClientTakeRideSelectSpecListItemAdapter(ClientTakeRideActivity.this, 0, mCommentListData);
-
-                }
-                requirement.setAdapter(listViewAdapter);
-                listViewAdapter.notifyDataSetChanged();
-
-                dialog.show();
-                cancel.setOnClickListener(new View.OnClickListener() {
-
-                    @Override
-                    public void onClick(View v) {
-                        dialog.cancel();
-                    }
-                });
-
-                String require;
-                spec_list.clear();
-                ok.setOnClickListener(new View.OnClickListener() {
-
-                    @Override
-                    public void onClick(View v) {
-                        String require="";
-                        for(ClientTakeRideSelectSpecListItem item:mCommentListData)
-                        {
-                            if(item.check)
-                            {
-                                spec_list.add(item);
-                                require+=item.book_title+",";
-                            }
-                        }
-
-                        if(!require.isEmpty())
-                            require=require.substring(0,require.length()-1);
-                        spec_value.setText(require);
-                        dialog.cancel();
-                    }
-                });
-
-
-            }
-
-        });*/
-
-        /*spec.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                // custom dialog
-                final Dialog dialog = new Dialog(ClientTakeRideActivity.this);
-                dialog.setContentView(R.layout.client_take_ride_selectspec_requirement);
-                dialog.setTitle(getString(R.string.txt_take_spec));
-                Button cancel = (Button) dialog.findViewById(R.id.button_category_cancel);
-                Button ok = (Button) dialog.findViewById(R.id.button_category_ok);
-
-                //dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-                // set the custom dialog components - text, image and button
-                ListView requirement = (ListView) dialog.findViewById(R.id.listViewDialog);
-
-                requirement.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-
-                        ClientTakeRideSelectSpecListItem item = mCommentListData.get(position);
-                        item.check= !item.check;
-                        mCommentListData.set(position,item);
-                        listViewAdapter.notifyDataSetChanged();
-                    }
-                });
-                getDataFromDB();
-                listViewAdapter = new ClientTakeRideSelectSpecListItemAdapter(ClientTakeRideActivity.this, 0, mCommentListData);
-                requirement.setAdapter(listViewAdapter);
-                listViewAdapter.notifyDataSetChanged();
-
-
-                dialog.show();
-                cancel.setOnClickListener(new View.OnClickListener() {
-
-                    @Override
-                    public void onClick(View v) {
-                        dialog.cancel();
-                    }
-                });
-
-                String require;
-                ok.setOnClickListener(new View.OnClickListener() {
-
-                    @Override
-                    public void onClick(View v) {
-                        String require="";
-                        for(ClientTakeRideSelectSpecListItem item:mCommentListData)
-                        {
-                            if(item.check)
-                            {
-                                spec_list.add(item);
-                                require+=item.book_title+",";
-                            }
-                        }
-                        //require.substring(0,require.length()-2);
-                        //require=require.substring(0,require.length()-1);
-                        spec_value.setText(require);
-                        dialog.cancel();
-                    }
-                });
-
-            }
-        });*/
 
         spec.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -640,6 +507,9 @@ public class ClientTakeRideActivity extends Activity {
 
             case ACTIONBAR_MENU_ITEM_SUMMIT:
                 //if (option == ClientTakeRideActivity.TAKE_RIDE) {
+                if(dataType == Constants.APP_REGISTER_DRIVER_TYPE.K_REGISTER_DRIVER_TYPE_UBER && destination_address.getText().toString().isEmpty())
+                    alert();
+               else
                if(!departure_address.getText().toString().isEmpty() && option != ClientTakeRideActivity.SEND_MERCHANDISE)
                      sendOrder();
                else if(option == ClientTakeRideActivity.SEND_MERCHANDISE && !departure_address.getText().toString().isEmpty() && !destination_address.getText().toString().isEmpty())
@@ -1386,7 +1256,21 @@ public class ClientTakeRideActivity extends Activity {
                     .setCancelable(false)
                     .setNegativeButton(getString(R.string.dialog_get_on_car_comfirm), new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
+                              if(destination_address.getText().toString().isEmpty())
+                              {
+                                  destination_address.setHint(getString(R.string.order_destination_alert));
+                                  destination_address.setHintTextColor(Color.RED);
+                                  destination_address.requestFocus();
 
+
+                              }
+
+                              if(departure_address.getText().toString().isEmpty())
+                              {
+                                  departure_address.setHint(getString(R.string.order_departure_alert));
+                                  departure_address.setHintTextColor(Color.RED);
+                                  departure_address.requestFocus();
+                              }
                         }
                     });
         // create alert dialog

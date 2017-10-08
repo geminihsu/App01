@@ -250,7 +250,7 @@ public class ClientTakeRideSearchActivity extends Activity {
                 {
                     //cancel order
 
-                    sendDataRequest.clientCancelOrder(order,null);
+                    sendDataRequest.clientCancelOrder(order);
                 }
 
                 return true;

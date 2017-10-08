@@ -15,7 +15,9 @@
  */
 package tw.com.geminihsu.app01.fragment;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -38,6 +40,8 @@ import java.util.List;
 
 import io.realm.RealmResults;
 import tw.com.geminihsu.app01.ClientTakeRideActivity;
+import tw.com.geminihsu.app01.ClientTakeRideSearchActivity;
+import tw.com.geminihsu.app01.MainActivity;
 import tw.com.geminihsu.app01.R;
 import tw.com.geminihsu.app01.SupportAnswerActivity;
 import tw.com.geminihsu.app01.adapter.BeginOrderListItem;
@@ -47,6 +51,7 @@ import tw.com.geminihsu.app01.adapter.OrderRecordListItemAdapter;
 import tw.com.geminihsu.app01.bean.AccountInfo;
 import tw.com.geminihsu.app01.bean.NormalOrder;
 import tw.com.geminihsu.app01.common.Constants;
+import tw.com.geminihsu.app01.serverbean.ServerSpecial;
 import tw.com.geminihsu.app01.utils.JsonPutsUtil;
 import tw.com.geminihsu.app01.utils.RealmUtil;
 import tw.com.geminihsu.app01.utils.ThreadPoolUtil;
@@ -64,6 +69,7 @@ public class Fragment_OrderRecord extends Fragment {
     private ArrayList<NormalOrder> orders;
     private ProgressDialog progressDialog_loading;
     private SwipeRefreshLayout loadOrderList;
+    private AlertDialog alertDialog = null;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -79,6 +85,7 @@ public class Fragment_OrderRecord extends Fragment {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_order_record, container, false);
     }
+
 
     @Override
     public void onStart() {
@@ -160,7 +167,10 @@ public class Fragment_OrderRecord extends Fragment {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
                 final OrderRecordListItem order= mRecordOrderListData.get(position);
-
+                //if(order.normalOrder.getTicket_status().equals("1")||order.normalOrder.getTicket_status().equals("0"))
+                //{
+                    orderDetail(order.normalOrder);
+                //}
 
             }
         });
@@ -204,6 +214,8 @@ public class Fragment_OrderRecord extends Fragment {
                     progressDialog_loading.dismiss();
                     progressDialog_loading=null;
                 }
+                Log.e(TAG,"orders size UI callback:"+orders.size());
+
                 loadOrderList.setRefreshing(false);
                 getOrderList(orders);
                 listViewAdapter.notifyDataSetChanged();
@@ -211,6 +223,7 @@ public class Fragment_OrderRecord extends Fragment {
 
             @Override
             public void getOrderListSuccess(RealmResults<NormalOrder> orders) {
+                Log.e(TAG,"orders size UI callback:"+orders.size());
                 if(progressDialog_loading!=null) {
                     progressDialog_loading.dismiss();
                     progressDialog_loading=null;
@@ -238,6 +251,32 @@ public class Fragment_OrderRecord extends Fragment {
 
                     }
                 }
+            }
+        });
+        sendDataRequest.setServerRequestOrderManagerCallBackFunction(new JsonPutsUtil.ServerRequestOrderManagerCallBackFunction() {
+
+            @Override
+            public void createNormalOrder(NormalOrder order) {
+
+
+            }
+
+            @Override
+            public void cancelNormalOrder(NormalOrder order) {
+                ThreadPoolUtil.getThreadPoolExecutor().execute((new Runnable(){
+                    @Override
+                    public void run() {
+                        if(getActivity()!=null) {
+                            Utility info = new Utility(getActivity());
+                            info.clearData(NormalOrder.class);
+                            sendDataRequest.queryClientOrderList(info.getAccountInfo());
+                        }
+                    }
+                }));
+
+                Toast.makeText(getActivity(),
+                        "訂單已取消 ",
+                        Toast.LENGTH_LONG).show();
             }
         });
 
@@ -288,6 +327,10 @@ public class Fragment_OrderRecord extends Fragment {
                 else
                 if(order.getTicket_status().equals("100"))
                     item.order_status = "已結案";
+                else
+                if(order.getTicket_status().equals("40"))
+                    item.order_status = "已取消";
+
 
 
                 item.order_status_fontColor = getResources().getColor(R.color.btn_bouns_upgrade);
@@ -320,4 +363,109 @@ public class Fragment_OrderRecord extends Fragment {
     }
 
 
+    private void orderDetail(final NormalOrder order)
+    {
+
+        String departure = "從："+order.getBegin_address()+"\n";
+        String stop = "";
+        String spec = "";
+        ServerSpecial specContent;
+
+        String type = "";
+        Constants.APP_REGISTER_ORDER_TYPE dataType = Constants.conversion_create_new_order_cargo_type_result(Integer.valueOf(order.getCargo_type()));
+        if (dataType == Constants.APP_REGISTER_ORDER_TYPE.K_REGISTER_ORDER_TYPE_TAKE_RIDE)
+            type = getString(R.string.client_take_ride_title);
+        else if (dataType == Constants.APP_REGISTER_ORDER_TYPE.K_REGISTER_ORDER_TYPE_PICK_UP_TRAIN)
+            type = getString(R.string.client_train_pick_up);
+        else if (dataType == Constants.APP_REGISTER_ORDER_TYPE.K_REGISTER_ORDER_TYPE_PICK_UP_AIRPORT)
+            type = getString(R.string.client_airplane_pick_up);
+        else if (dataType == Constants.APP_REGISTER_ORDER_TYPE.K_REGISTER_ORDER_TYPE_SEND_MERCHANDISE)
+            type = getString(R.string.client_merchanse_send_title);
+
+
+        if(!order.getStop_address().equals("0"))
+            stop = "停靠："+order.getStop_address()+"\n";
+        String destination ="到："+ order.getEnd_address()+"\n";
+        String orderType = "時間：即時"+"\n";
+        spec = "特殊需求：";
+        String remark= "";
+        String spec_detail = "";
+        if(order.getCar_special()!=null) {
+            String[] spec_array = order.getCar_special().split(",");
+            if(!order.getCar_special().equals("")){
+                if(spec_array.length == 0) {
+                    RealmUtil specQuery = new RealmUtil(getActivity());
+                    specContent = specQuery.queryServerSpecialItem(Constants.SPEC_ID, order.getCar_special());
+                    spec +=  specContent.getContent();
+                }else {
+
+                    for (String spec_id : spec_array) {
+                        RealmUtil specQuery = new RealmUtil(getActivity());
+                        specContent = specQuery.queryServerSpecialItem(Constants.SPEC_ID, spec_id);
+                        spec_detail += specContent.getContent() + ",";
+
+                    }
+                }
+
+                spec_detail = spec_detail.substring(0,spec_detail.length()-1);
+                spec += spec_detail+"\n";
+            }else
+                spec = "";
+        }
+
+        if(!order.getRemark().equals(""))
+            remark = "備註：" +order.getRemark();
+        else
+            remark = "";
+        final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+                getActivity());
+
+        // set title
+        alertDialogBuilder.setTitle(getString(R.string.order_info));
+
+        if(order.getTicket_status().equals("1")||order.getTicket_status().equals("0"))
+        {
+
+            // set dialog message
+            alertDialogBuilder
+                    .setMessage("訂單類型:" + type + "\n" + "客戶電話:" + order.getUser_name() + "\n" + departure + stop + destination + orderType + spec + remark)
+                    .setCancelable(false)
+
+                    .setNegativeButton(getString(R.string.cancel_take_spec), new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+
+                        }
+                    })
+
+                    .setPositiveButton(getString(R.string.cancel_take_spec_order), new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            //cancel order
+                            sendDataRequest.clientCancelOrder(order);
+                            alertDialog.cancel();
+                            alertDialog = null;
+                            if (progressDialog_loading==null) {
+                                progressDialog_loading = ProgressDialog.show(getActivity(), "",
+                                        "Loading. Please wait...", true);
+                            }
+                        }
+                    });
+        }else
+        {
+            // set dialog message
+            alertDialogBuilder
+                    .setMessage("訂單類型:" + type + "\n" + "客戶電話:" + order.getUser_name() + "\n" + departure + stop + destination + orderType + spec + remark)
+                    .setCancelable(false)
+
+                    .setNegativeButton(getString(R.string.cancel_take_spec), new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+
+                        }
+                    });
+        }
+        // create alert dialog
+        alertDialog = alertDialogBuilder.create();
+
+        // show it
+        alertDialog.show();
+    }
 }

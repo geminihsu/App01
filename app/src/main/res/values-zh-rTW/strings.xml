@@ -388,6 +388,7 @@
     <string name="sure_take_spec">確認</string>
     <string name="sure_ok">確定</string>
     <string name="cancel_take_spec">取消</string>
+    <string name="cancel_take_spec_order">取消訂單</string>
     <string name="menu_dialog_sure">確認單</string>
     <string name="txt_take_spec">請選擇特殊需求：</string>
     <string name="pick_up_tra_train">台鐵</string>
@@ -395,6 +396,8 @@
     <string name="pick_up_train">車站</string>
     <string name="txt_send_merchandise">選擇站點</string>
     <string name="order_info">訂單細節</string>
+    <string name="order_destination_alert">請輸入終點</string>
+    <string name="order_depature_alert">請輸入起點</string>
 
 
     <!-- ClientOrderCarSearch -->

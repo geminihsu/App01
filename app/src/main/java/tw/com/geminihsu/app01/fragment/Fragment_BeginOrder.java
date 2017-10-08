@@ -30,6 +30,7 @@ public class Fragment_BeginOrder extends Fragment {
     private List<String> mTabNamesList;
     private final int ACTIONBAR_MENU_ITEM_FIILTER = 0x0001;
     private ViewPager viewPager;
+    private ItemsPagerAdapter itemsPagerAdapter;
 
     public Fragment_BeginOrder() {
         // Required empty public constructor
@@ -67,7 +68,8 @@ public class Fragment_BeginOrder extends Fragment {
         View view = inflater.inflate(R.layout.fragment_beginorder, container, false);
         viewPager = (ViewPager) view.findViewById(R.id.viewPager);
         //viewPager.setId(View.generateViewId());
-        viewPager.setAdapter(new ItemsPagerAdapter(getChildFragmentManager(), mTabNamesList));
+        itemsPagerAdapter = new ItemsPagerAdapter(getChildFragmentManager(), mTabNamesList);
+        viewPager.setAdapter(itemsPagerAdapter);
         mToolbarSetupCallback.setupTabLayout(viewPager);
 
         return view;
@@ -84,6 +86,7 @@ public class Fragment_BeginOrder extends Fragment {
     public void onStop()
     {
         super.onStop();
+        itemsPagerAdapter.notifyDataSetChanged();
         //call to ViewPage to remove the pages
         viewPager.removeAllViews();
 
