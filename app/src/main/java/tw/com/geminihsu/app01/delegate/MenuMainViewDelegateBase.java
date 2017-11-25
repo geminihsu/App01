@@ -6,15 +6,12 @@ import tw.com.geminihsu.app01.MenuMainActivity;
 import tw.com.geminihsu.app01.R;
 import tw.com.geminihsu.app01.fragment.Fragment_About;
 import tw.com.geminihsu.app01.fragment.Fragment_Account;
-import tw.com.geminihsu.app01.fragment.Fragment_BeginOrder;
-import tw.com.geminihsu.app01.fragment.Fragment_BeginOrderInteractive;
 import tw.com.geminihsu.app01.fragment.Fragment_BeginOrderList;
 import tw.com.geminihsu.app01.fragment.Fragment_Bouns;
-import tw.com.geminihsu.app01.fragment.Fragment_Client_Service_test;
+import tw.com.geminihsu.app01.fragment.Fragment_Client_Service;
 import tw.com.geminihsu.app01.fragment.Fragment_NotifyList;
 import tw.com.geminihsu.app01.fragment.Fragment_OrderFilter;
 import tw.com.geminihsu.app01.fragment.Fragment_OrderRecord;
-import tw.com.geminihsu.app01.fragment.Fragment_Client_Service;
 import tw.com.geminihsu.app01.common.Constants;
 import tw.com.geminihsu.app01.fragment.Fragment_Support;
 
@@ -83,11 +80,11 @@ public class MenuMainViewDelegateBase extends BaseViewDelegate{
 
 	public void setNavigationItemOnClick_service() {
 		FragmentTransaction fragTran;
-		Fragment_Client_Service_test frag2 = new Fragment_Client_Service_test();
+		Fragment_Client_Service frag2 = new Fragment_Client_Service();
 		fragTran = mainActivity.getSupportFragmentManager().beginTransaction();
-		fragTran.replace(R.id.container, frag2, Fragment_Client_Service_test.class.getSimpleName());
+		fragTran.replace(R.id.container, frag2, Fragment_Client_Service.class.getSimpleName());
 		fragTran.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-		fragTran.addToBackStack(Fragment_Client_Service_test.class.getSimpleName());
+		fragTran.addToBackStack(Fragment_Client_Service.class.getSimpleName());
 		fragTran.commit();
 
 	}

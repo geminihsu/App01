@@ -1,16 +1,12 @@
 package tw.com.geminihsu.app01;
 
 
-import android.*;
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -27,30 +23,21 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.google.firebase.iid.FirebaseInstanceId;
-//import com.newrelic.agent.android.Agent;
 import com.packetzoom.speed.PacketZoomClient;
 
-import java.net.HttpURLConnection;
 import java.util.ArrayList;
 
-import io.realm.RealmResults;
 import tw.com.geminihsu.app01.bean.AccountInfo;
 import tw.com.geminihsu.app01.bean.DriverIdentifyInfo;
-import tw.com.geminihsu.app01.serverbean.ServerContents;
 import tw.com.geminihsu.app01.common.Constants;
-import tw.com.geminihsu.app01.service.App01Service;
 import tw.com.geminihsu.app01.utils.ConfigSharedPreferencesUtil;
 import tw.com.geminihsu.app01.utils.FileUtil;
-import tw.com.geminihsu.app01.utils.FormatUtils;
 import tw.com.geminihsu.app01.utils.JsonPutsUtil;
 import tw.com.geminihsu.app01.utils.RealmUtil;
 import tw.com.geminihsu.app01.utils.ThreadPoolUtil;
-import tw.com.geminihsu.app01.utils.Utility;
-//import com.newrelic.agent.android.NewRelic;
 
 public class MainActivity extends Activity {
     public final static String TAG = MainActivity.class.toString();// from
-    public final static String BUNDLE_ACCESS_KEY = "accesskey";// from
 
     private static int id = 1;
     public final static int ERROR_USER_INFO = 0;
@@ -67,12 +54,10 @@ public class MainActivity extends Activity {
     private String phone_number="";
     private String password="";
 
-    String token ="";
-
     private SharedPreferences configSharedPreferences;
     private ProgressDialog dialog;
     private AccountInfo user;
-    private DriverIdentifyInfo driverIdentifyInfo;
+
     private AlertDialog alertDialog;
     private JsonPutsUtil sendDataRequest;
     // Storage Permissions
@@ -102,9 +87,6 @@ public class MainActivity extends Activity {
             public void loginClient(AccountInfo accountInfo) {
                 Constants.Driver = false;
                 Intent intent = new Intent(MainActivity.this, MenuMainActivity.class);
-                //Bundle b = new Bundle();
-                //b.putString(BUNDLE_ACCESS_KEY, accesskey);
-                //intent.putExtras(b);
                 startActivity(intent);
                 finish();
             }
@@ -113,9 +95,7 @@ public class MainActivity extends Activity {
             public void loginDriver(DriverIdentifyInfo driver) {
                 Constants.Driver = true;
                 Intent intent = new Intent(MainActivity.this, MenuMainActivity.class);
-                //Bundle b = new Bundle();
-                //b.putString(BUNDLE_ACCESS_KEY, accesskey);
-                //intent.putExtras(b);
+
                 startActivity(intent);
                 finish();
             }
@@ -172,7 +152,6 @@ public class MainActivity extends Activity {
     protected void onStop()
     {
         super.onStop();
-        //unregisterReceiver(notifyAccountExpiredBroadcastReceiver);
 
     }
 
@@ -186,8 +165,6 @@ public class MainActivity extends Activity {
     @Override
     protected void onStart() {
         super.onStart();
-        //token = FirebaseInstanceId.getInstance().getToken();
-        //Log.d("FCM", "Token:" + token);
 
         configSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
@@ -215,9 +192,8 @@ public class MainActivity extends Activity {
         account_phone = (EditText) findViewById(R.id.account_phone);
         account_phone.addTextChangedListener(checkPhoneFormat);
 
-        //account_phone.setText(token);
+
         account_password = (EditText)findViewById(R.id.account_password);
-        //account_password.addTextChangedListener(checkIdentityFormat);
 
         if (!phone_number.isEmpty() && !password.isEmpty()) {
             account_phone.setText(phone_number);
@@ -289,9 +265,7 @@ public class MainActivity extends Activity {
 
     private void queryAccount(){
 
-        //if(user!=null) {
-         //   if(user.getPassword().equals(password)) {
-                if(dialog == null)
+        if(dialog == null)
                    dialog = ProgressDialog.show(MainActivity.this, "",
                         "Loading. Please wait...", true);
         ThreadPoolUtil.getThreadPoolExecutor().execute((new Runnable(){
@@ -302,38 +276,8 @@ public class MainActivity extends Activity {
             }
         }));
 
-
-       //     }else
-       //         alert(ERROR_USER_INFO);
-       // }else
-       //     alert(ERROR_NO_USER);
-
     }
-    private TextWatcher checkIdentityFormat= new TextWatcher() {
-        private CharSequence temp;
 
-        @Override
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            temp = s;
-        }
-
-        @Override
-        public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-        }
-
-
-        @Override
-        public void afterTextChanged(Editable s) {
-            //判斷是否為身分證格式
-            if (!FormatUtils.isIdNoFormat(temp.toString())) {
-                //TODO:身份證錯誤處理
-                account_password.setError(getString(R.string.login_error_register_msg));
-            }
-        }
-
-
-    };
 
     private TextWatcher checkPhoneFormat= new TextWatcher() {
         private CharSequence temp;
@@ -411,9 +355,6 @@ public class MainActivity extends Activity {
     private void changeActivity()
     {
         Intent intent = new Intent(getApplicationContext(), MenuMainActivity.class);
-                /*Bundle b = new Bundle();
-                b.putSerializable(BUNDLE_ACCESS_KEY, user.getAccessKey());
-                intent.putExtras(b);*/
         startActivity(intent);
         finish();
     }

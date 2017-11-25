@@ -7,9 +7,8 @@ import android.view.Menu;
 
 import tw.com.geminihsu.app01.MenuMainActivity;
 import tw.com.geminihsu.app01.R;
-import tw.com.geminihsu.app01.fragment.Fragment_Client_Service;
 import tw.com.geminihsu.app01.delegate.MenuMainViewDelegateBase;
-import tw.com.geminihsu.app01.fragment.Fragment_Client_Service_test;
+import tw.com.geminihsu.app01.fragment.Fragment_Client_Service;
 
 public class MenuMainViewDelegateCustomer extends MenuMainViewDelegateBase {
 	private final String TAG= this.getClass().getSimpleName();
@@ -22,7 +21,7 @@ public class MenuMainViewDelegateCustomer extends MenuMainViewDelegateBase {
 	@Override
 	public void setContentLayoutFragment() {
 
-		Fragment newFragment = new Fragment_Client_Service_test();
+		Fragment newFragment = new Fragment_Client_Service();
 
 		FragmentTransaction ft = mainActivity.getSupportFragmentManager().beginTransaction();
 		//if (mainActivity.getSupportFragmentManager().findFragmentByTag(MultiLiveView.PARENT_FRAGMENT_TAG_ID) == null) {

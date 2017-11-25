@@ -56,26 +56,18 @@ import tw.com.geminihsu.app01.utils.Utility;
 
 public class MenuMainActivity extends AppCompatActivity implements Fragment_BeginOrder.TabLayoutSetupCallback,Fragment_ClientAirPlanePickUp.TabLayoutSetupCallback,Fragment_TrainPlanePickUp.TabLayoutSetupCallback,Fragment_MerchandiseDorkPickUp.TabLayoutSetupCallback,
         Fragment_BeginOrderInteractive.OnListItemClickListener,LocationListener,FragmentViewListener {
-    private static final String[] INITIAL_PERMS={
-            Manifest.permission.ACCESS_FINE_LOCATION
-    };
 
-    private static final String[] LOCATION_PERMS={
-            Manifest.permission.ACCESS_FINE_LOCATION
-    };
     private BroadcastReceiver notifyAccountExpiredBroadcastReceiver;//當收到通知後跳到登入頁面
 
-    private static final int INITIAL_REQUEST=1337;
-    private static final int LOCATION_REQUEST=100;
+
     public final static int ERROR_NO_GPS = 2;
     private final String TAG=this.getClass().getSimpleName();
     private MenuMainViewDelegateBase viewDelegateBase;
     private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle mActionBarDrawerToggle;
     private NavigationView navigationView;
-    private ShareActionProvider mShareActionProvider;
+
     private App01Service myBinder;
-    private AccountInfo user;
     private boolean isServerInfoExsit;
 
 
@@ -262,13 +254,7 @@ public class MenuMainActivity extends AppCompatActivity implements Fragment_Begi
                         return true;
                     case R.id.navigation_item_share:
 
-                        // MenuItem item = menuItem.getSubMenu().findItem(R.id.navigation_item_share);
-                        // Fetch and store ShareActionProvider
-                        ;
 
-
-                        //mShareActionProvider =(ShareActionProvider)MenuItemCompat.getActionProvider(menuItem);
-                        //setShareIntent(createShareIntent());
                         Intent share = new Intent(Intent.ACTION_SEND);
                         share.setType("text/plain"); // might be text, sound, whatever
                         share.putExtra(Intent.EXTRA_SUBJECT, "App01");
@@ -277,11 +263,6 @@ public class MenuMainActivity extends AppCompatActivity implements Fragment_Begi
                         share.putExtra(Intent.EXTRA_TEXT, sAux);
                         startActivity(Intent.createChooser(share, "Share"));
                         return true;
-
-                       /* Intent share = new Intent(Intent.ACTION_SEND);
-                        share.setType("image/jpeg"); // might be text, sound, whatever
-                        //share.putExtra(Intent.EXTRA_STREAM, pathToPicture);
-                        startActivity(Intent.createChooser(share, "share"));*/
 
                     case R.id.navigation_item_account:
                         viewDelegateBase.setNavigationItemOnClick_account();
@@ -333,20 +314,9 @@ public class MenuMainActivity extends AppCompatActivity implements Fragment_Begi
         unregisterReceiver(notifyAccountExpiredBroadcastReceiver);
 
     }
-    // Call to update the share intent
-    private void setShareIntent(Intent shareIntent) {
-        if (mShareActionProvider != null) {
-            mShareActionProvider.setShareIntent(shareIntent);
-        }
-    }
 
-    private Intent createShareIntent() {
-        Intent shareIntent = new Intent(Intent.ACTION_SEND);
-        shareIntent.setType("text/plain");
-        shareIntent.putExtra(Intent.EXTRA_TEXT,
-                "http://stackandroid.com");
-        return shareIntent;
-    }
+
+
 
     @Override
     public void setupTabLayout(ViewPager viewPager) {
@@ -415,19 +385,8 @@ public class MenuMainActivity extends AppCompatActivity implements Fragment_Begi
         }
     }
 
-    private boolean canAccessLocation() {
-        return(hasPermission(Manifest.permission.ACCESS_FINE_LOCATION));
-    }
 
 
-    @SuppressLint("NewApi")
-    private boolean hasPermission(String perm) {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return (PackageManager.PERMISSION_GRANTED == checkSelfPermission(perm));
-        }else
-            return false;
-    }
 
     @Override
     public void refreshListView() {
