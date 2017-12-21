@@ -21,6 +21,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.MenuItemCompat;
@@ -43,6 +44,8 @@ import tw.com.geminihsu.app01.callback.FragmentViewListener;
 import tw.com.geminihsu.app01.fragment.Fragment_BeginOrder;
 import tw.com.geminihsu.app01.fragment.Fragment_BeginOrderInteractive;
 import tw.com.geminihsu.app01.fragment.Fragment_ClientAirPlanePickUp;
+import tw.com.geminihsu.app01.fragment.Fragment_Client_Service;
+import tw.com.geminihsu.app01.fragment.Fragment_Client_SubService;
 import tw.com.geminihsu.app01.fragment.Fragment_MerchandiseDorkPickUp;
 import tw.com.geminihsu.app01.fragment.Fragment_Support;
 import tw.com.geminihsu.app01.fragment.Fragment_TrainPlanePickUp;
@@ -284,24 +287,29 @@ public class MenuMainActivity extends AppCompatActivity implements Fragment_Begi
     }
         @Override
     public void onBackPressed() {
-            AlertDialog.Builder dialog = new AlertDialog.Builder(this);
-            dialog.setTitle(getString(R.string.dialog_title_exit));
-            dialog.setMessage(getString(R.string.dialog_info_confirm_exit));
-            //dialog.setIcon(android.R.drawable.ic_dialog_alert);
-            dialog.setCancelable(false);
-            dialog.setPositiveButton(getString(R.string.g_yes), new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int which) {
-                    // 按下PositiveButton要做的事
-                    finish(); // or call the popBackStack on the container if necessary
-                }
-            });
-            dialog.setNegativeButton(getString(R.string.g_no), new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int which) {
 
-                }
-            });
 
-            dialog.show();
+            if (!getSupportFragmentManager().popBackStackImmediate()) {
+
+                AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+                dialog.setTitle(getString(R.string.dialog_title_exit));
+                dialog.setMessage(getString(R.string.dialog_info_confirm_exit));
+                //dialog.setIcon(android.R.drawable.ic_dialog_alert);
+                dialog.setCancelable(false);
+                dialog.setPositiveButton(getString(R.string.g_yes), new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        // 按下PositiveButton要做的事
+                        finish(); // or call the popBackStack on the container if necessary
+                    }
+                });
+                dialog.setNegativeButton(getString(R.string.g_no), new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+
+                dialog.show();
+            }
     }
 
     @Override

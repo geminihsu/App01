@@ -864,6 +864,11 @@ public class Fragment_PickUpAirPlane extends Fragment {
         order.setOrderdate(time.getText().toString());
         order.setTarget(target);
 
+
+        if(price.equals(""))
+            price = "0";
+        if(tip.equals(""))
+            tip = "0";
         order.setPrice(price);
         order.setTip(tip);
 
@@ -879,7 +884,10 @@ public class Fragment_PickUpAirPlane extends Fragment {
 
         //Log.e(TAG,"spec car:"+spec);
         order.setCar_special(spec);
-        order.setRemark(reMark.getText().toString());
+
+        if(!reMark.getText().toString().equals(""))
+            order.setRemark(reMark.getText().toString());
+
 
         //sendDataRequest.putCreateQuickTaxiOrder(order);
         if(progressDialog_loading==null) {
@@ -935,14 +943,16 @@ public class Fragment_PickUpAirPlane extends Fragment {
 
             //Log.e("", "Stop zipCode:" + stop_locations.get(0).getPostalCode());
             stop_detail = new LocationAddress();
-            if (stop_locations.size() > 0) {
-                stop_detail.setLongitude(stop_locations.get(0).getLongitude());
-                stop_detail.setLatitude(stop_locations.get(0).getLatitude());
-                stop_detail.setAddress(stop);
-                stop_detail.setLocation(stop);
-                stop_detail.setCountryName(stop_locations.get(0).getCountryName());
-                stop_detail.setLocality(stop_locations.get(0).getLocality());
-                stop_detail.setZipCode(stop_locations.get(0).getPostalCode());
+            if(stop_locations!=null) {
+                if (stop_locations.size() > 0) {
+                    stop_detail.setLongitude(stop_locations.get(0).getLongitude());
+                    stop_detail.setLatitude(stop_locations.get(0).getLatitude());
+                    stop_detail.setAddress(stop);
+                    stop_detail.setLocation(stop);
+                    stop_detail.setCountryName(stop_locations.get(0).getCountryName());
+                    stop_detail.setLocality(stop_locations.get(0).getLocality());
+                    stop_detail.setZipCode(stop_locations.get(0).getPostalCode());
+                }
             }
         }
         String destination = destination_address.getText().toString();
@@ -957,14 +967,16 @@ public class Fragment_PickUpAirPlane extends Fragment {
 
 
             destination_detail = new LocationAddress();
-            if (destination_locations.size() > 0) {
-                destination_detail.setLongitude(destination_locations.get(0).getLongitude());
-                destination_detail.setLatitude(destination_locations.get(0).getLatitude());
-                destination_detail.setAddress(destination);
-                destination_detail.setLocation(destination);
-                destination_detail.setCountryName(destination_locations.get(0).getCountryName());
-                destination_detail.setLocality(destination_locations.get(0).getLocality());
-                destination_detail.setZipCode(destination_locations.get(0).getPostalCode());
+            if(destination_locations != null) {
+                if (destination_locations.size() > 0) {
+                    destination_detail.setLongitude(destination_locations.get(0).getLongitude());
+                    destination_detail.setLatitude(destination_locations.get(0).getLatitude());
+                    destination_detail.setAddress(destination);
+                    destination_detail.setLocation(destination);
+                    destination_detail.setCountryName(destination_locations.get(0).getCountryName());
+                    destination_detail.setLocality(destination_locations.get(0).getLocality());
+                    destination_detail.setZipCode(destination_locations.get(0).getPostalCode());
+                }
             }
         }
 

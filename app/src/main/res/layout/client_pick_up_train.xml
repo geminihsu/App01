@@ -204,6 +204,7 @@
                     android:layout_width="fill_parent"
                     android:layout_height="match_parent"
                     android:orientation="horizontal"
+                    android:visibility="gone"
                     >
                     <TextView
                         android:id="@+id/departurestation"
@@ -222,7 +223,6 @@
                         android:layout_gravity="center_horizontal"
                         android:layout_marginRight="10dp"
                         android:drawSelectorOnTop="true"
-                        android:visibility="gone"
                         />
                     <ImageButton
                         android:id="@+id/map_departure"
@@ -284,7 +284,7 @@
                         android:textColor="@color/btn_bouns_title"
                         />
                     <RadioGroup
-                        android:id="@+id/train"
+                        android:id="@+id/train_radio_group"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
@@ -385,23 +385,23 @@
             >
             <TextView
                 android:id="@+id/passenger_spec"
-                android:layout_width="wrap_content"
+                android:layout_width="100dp"
                 android:layout_height="wrap_content"
-                android:ellipsize="middle"
-                android:singleLine="true"
                 android:paddingLeft="20dp"
-                android:layout_weight="1"
                 android:text="@string/merchandise_requirement"
                 android:textColor="@color/btn_bouns_title"
                 />
-            <TextView
+            <EditText
                 android:id="@+id/passenger_spec_value"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:ellipsize="end"
-                android:singleLine="true"
+                android:focusable="false"
+                android:textStyle="bold"
+                android:paddingLeft="10dp"
+                android:textSize="@dimen/default_text_address_host_size_sp"
                 android:layout_weight="1"
                 android:text=""/>
+
             <ImageButton
                 android:id="@+id/spec_option"
                 android:layout_width="wrap_content"

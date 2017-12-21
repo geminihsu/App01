@@ -461,11 +461,11 @@
     <string name="unit_hit_length">請輸入物體長度(cm)</string>
     <string name="unit_hit_width">請輸入物體寬度(cm)</string>
     <string name="unit_hit_high">請輸入物體高度(cm)</string>
-    //Camera2RawFragment
+    <!--  Camera2RawFragment -->
     <string name="request_permission">This app needs camera permission.</string>
     <string name="picture">Picture</string>
     <string name="description_info">Info</string>
-    //尋找地圖
+    <!-- 尋找地圖  -->
     <string name="map_bookmark">加入常用</string>
     <string name="map_add_bookmark">輸入名稱</string>
     <string name="map_search_address">請輸入要查詢的地點</string>

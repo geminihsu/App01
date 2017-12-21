@@ -29,6 +29,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -88,6 +89,9 @@ public class Fragment_PickUpTrain extends Fragment {
 
     final public static int SEND_TRAIN = 0;
     final public static int PICKUP_TRAIN =1;
+
+    private AlertDialog choiceSpecAlertDialog;
+
     private LinearLayout change;
     private LinearLayout linearLayout_departure;
     private LinearLayout linearLayout_destination;
@@ -101,6 +105,8 @@ public class Fragment_PickUpTrain extends Fragment {
     private ImageButton destination;
     private ImageButton spec;
     private ImageButton btn_datePicker;
+
+
     private TextView show_title;
     private TextView spec_value;
 
@@ -126,6 +132,7 @@ public class Fragment_PickUpTrain extends Fragment {
     private EditText date;
     private EditText time;
     private EditText reMark;
+    private EditText spec_dialog;
 
     private ArrayAdapter arrayAdapter_location;
     private ArrayAdapter arrayAdapter_departure;
@@ -159,6 +166,8 @@ public class Fragment_PickUpTrain extends Fragment {
     private long order_timeStamp;
     private ArrayList<ClientTakeRideSelectSpecListItem> spec_list;
     private ProgressDialog progressDialog_loading;
+
+
 
 
     private String curAddress = "";
@@ -261,7 +270,7 @@ public class Fragment_PickUpTrain extends Fragment {
         spinner_go_location = (Spinner)getActivity().findViewById(R.id.train_go_location);
         spinner_departure =(Spinner)getActivity().findViewById(R.id.train_departure);
         radiogroup_leave_location= (RadioGroup)getActivity().findViewById(R.id.departure_train);
-        radiogroup_destination_station =(RadioGroup)getActivity().findViewById(R.id.train);
+        radiogroup_destination_station =(RadioGroup)getActivity().findViewById(R.id.train_radio_group);
         radioGroup_orderTimetype = (RadioGroup) getActivity().findViewById(R.id.source);
 
         realtime = (RadioButton)getActivity().findViewById(R.id.real_radio);
@@ -282,7 +291,7 @@ public class Fragment_PickUpTrain extends Fragment {
         date = (EditText) getActivity().findViewById(R.id.date_info);
         time = (EditText) getActivity().findViewById(R.id.time_info);
         reMark = (EditText) getActivity().findViewById(R.id.spec_info);
-
+        spec_dialog = (EditText) getActivity().findViewById(R.id.passenger_spec_value);
 
 
         Date dateIfo=new Date();
@@ -522,68 +531,12 @@ public class Fragment_PickUpTrain extends Fragment {
 
 
         getDataFromDB();
-        linearLayout_spec.setOnClickListener(new View.OnClickListener() {
+
+        spec_dialog.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
-                // custom dialog
-                final Dialog dialog = new Dialog(getActivity());
-                dialog.setContentView(R.layout.client_take_ride_selectspec_requirement);
-                dialog.setTitle(getString(R.string.txt_take_spec));
-                Button cancel = (Button) dialog.findViewById(R.id.button_category_cancel);
-                Button ok = (Button) dialog.findViewById(R.id.button_category_ok);
-
-                //dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-                // set the custom dialog components - text, image and button
-                ListView requirement = (ListView) dialog.findViewById(R.id.listViewDialog);
-
-                requirement.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-
-                        ClientTakeRideSelectSpecListItem item = mCommentListData.get(position);
-                        item.check= !item.check;
-                        mCommentListData.set(position,item);
-                        listViewAdapter.notifyDataSetChanged();
-                    }
-                });
-
-                if(listViewAdapter == null) {
-                    listViewAdapter = new ClientTakeRideSelectSpecListItemAdapter(getActivity(), 0, mCommentListData);
-
-                }
-                requirement.setAdapter(listViewAdapter);
-                listViewAdapter.notifyDataSetChanged();
-
-                dialog.show();
-                cancel.setOnClickListener(new View.OnClickListener() {
-
-                    @Override
-                    public void onClick(View v) {
-                        dialog.cancel();
-                    }
-                });
-
-                String require;
-                ok.setOnClickListener(new View.OnClickListener() {
-
-                    @Override
-                    public void onClick(View v) {
-                        String require="";
-                        for(ClientTakeRideSelectSpecListItem item:mCommentListData)
-                        {
-                            if(item.check)
-                            {
-                                spec_list.add(item);
-                                require+=item.book_title+",";
-                            }
-                        }
-
-                        if(!require.isEmpty())
-                            require=require.substring(0,require.length()-1);
-                        spec_value.setText(require);
-                        dialog.cancel();
-                    }
-                });
+                choiceSpecFilter();
 
             }
         });
@@ -592,30 +545,7 @@ public class Fragment_PickUpTrain extends Fragment {
 
             @Override
             public void onClick(View v) {
-                // custom dialog
-                final Dialog dialog = new Dialog(getActivity());
-                dialog.setContentView(R.layout.client_take_ride_selectspec_requirement);
-                dialog.setTitle(getString(R.string.txt_take_spec));
-                Button cancel = (Button) dialog.findViewById(R.id.button_category_ok);
-
-                //dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-                // set the custom dialog components - text, image and button
-                ListView requirement = (ListView) dialog.findViewById(R.id.listViewDialog);
-
-                getDataFromDB();
-                listViewAdapter = new ClientTakeRideSelectSpecListItemAdapter(getActivity(), 0, mCommentListData);
-                requirement.setAdapter(listViewAdapter);
-                listViewAdapter.notifyDataSetChanged();
-
-
-                dialog.show();
-                cancel.setOnClickListener(new View.OnClickListener() {
-
-                    @Override
-                    public void onClick(View v) {
-                        dialog.cancel();
-                    }
-                });
+                choiceSpecFilter();
 
             }
         });
@@ -860,6 +790,100 @@ public class Fragment_PickUpTrain extends Fragment {
 
     }
 
+    private void choiceSpecFilter() {
+        //specData.clear();
+        LayoutInflater inflater = LayoutInflater.from(getActivity());
+        View login_view = inflater.inflate(R.layout.client_take_ride_spec_item, null);
+        ListView lv = (ListView) login_view.findViewById(R.id.listviewicon);
+        Button btn_ok = (Button) login_view.findViewById(R.id.button_category_ok);
+        Button btn_cancel = (Button) login_view.findViewById(R.id.button_category_cancel);
+        btn_ok.setVisibility(View.VISIBLE);
+        btn_cancel.setVisibility(View.VISIBLE);
+        if (choiceSpecAlertDialog == null) {
+            choiceSpecAlertDialog = new AlertDialog.Builder(getActivity()).create();
+
+            //Resources res = getResources();
+            //final String[] status = res.getStringArray(R.array.client_take_ride_requirement);
+            // Change MyActivity.this and myListOfItems to your own values
+            if (listViewAdapter == null) {
+                getDataFromDB();
+                listViewAdapter = new ClientTakeRideSelectSpecListItemAdapter(getActivity(), 0, mCommentListData);
+                lv.setAdapter(listViewAdapter);
+            } else {
+                lv.setAdapter(listViewAdapter);
+                listViewAdapter.notifyDataSetChanged();
+            }
+
+            lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                public void onItemClick(AdapterView<?> a, View v, int position, long id) {
+                    ClientTakeRideSelectSpecListItem clientTakeRideSelectSpecListItem = mCommentListData.get(position);
+                    clientTakeRideSelectSpecListItem.check = !clientTakeRideSelectSpecListItem.check;
+                    if (clientTakeRideSelectSpecListItem.check) {
+                        if(!spec_list.contains(clientTakeRideSelectSpecListItem))
+                        {
+                            spec_list.add(clientTakeRideSelectSpecListItem);
+                        }
+                        // status_selectedItem = position;
+                    }else
+                        spec_list.remove(clientTakeRideSelectSpecListItem);
+
+                    mCommentListData.set(position, clientTakeRideSelectSpecListItem);
+                    /*for (int i = 0; i < mCommentListData.size(); i++) {
+                        if (i != position) {
+
+                            ClientTakeRideSelectSpecListItem clientTakeRideSelectSpecListItemOther = mCommentListData.get(i);
+
+                            clientTakeRideSelectSpecListItemOther.check = false;
+                            mCommentListData.set(i, clientTakeRideSelectSpecListItemOther);
+                        }
+
+                    }*/
+                    listViewAdapter.notifyDataSetChanged();
+                }
+            });
+            choiceSpecAlertDialog.setView(login_view);
+
+            btn_ok.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    //show_target_event_status.setText(status[status_selectedItem]);
+
+                    String content = "";
+                    for(int i = 0; i < spec_list.size(); i++)
+                    {
+                        content+=spec_list.get(i).book_title;
+                        if(i != spec_list.size() -1)
+                            content += ",";
+                    }
+
+                    Log.e("","Spec:"+content);
+                    spec_dialog.setText(content);
+                    choiceSpecAlertDialog.dismiss();
+                    choiceSpecAlertDialog = null;
+                }
+            });
+
+            btn_cancel.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    for(int i = 0; i < mCommentListData.size(); i++)
+                    {
+                        ClientTakeRideSelectSpecListItem clientTakeRideSelectSpecListItem = mCommentListData.get(i);
+                        clientTakeRideSelectSpecListItem.check = false;
+                        mCommentListData.set(i, clientTakeRideSelectSpecListItem);
+
+                    }
+                    listViewAdapter.notifyDataSetChanged();
+                    choiceSpecAlertDialog.dismiss();
+                    choiceSpecAlertDialog = null;
+                }
+            });
+
+            choiceSpecAlertDialog.setCancelable(false);
+            choiceSpecAlertDialog.show();
+        }
+
+    }
+
+
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         MenuItem item = menu.add(Menu.NONE, ACTIONBAR_MENU_ITEM_SUMMIT, Menu.NONE, getString(R.string.menu_take));
@@ -987,6 +1011,10 @@ public class Fragment_PickUpTrain extends Fragment {
         order.setOrderdate(time.getText().toString());
         order.setTarget(target);
 
+        if(price.equals(""))
+            price = "0";
+        if(tip.equals(""))
+            tip = "0";
         order.setPrice(price);
         order.setTip(tip);
 
@@ -1002,7 +1030,9 @@ public class Fragment_PickUpTrain extends Fragment {
 
         //Log.e(TAG,"spec car:"+spec);
         order.setCar_special(spec);
-        order.setRemark(reMark.getText().toString());
+        if(!reMark.getText().toString().equals(""))
+            order.setRemark(reMark.getText().toString());
+
         //sendDataRequest.putCreateQuickTaxiOrder(order);
         if(progressDialog_loading==null) {
             progressDialog_loading = ProgressDialog.show(getActivity(), "",
@@ -1057,14 +1087,16 @@ public class Fragment_PickUpTrain extends Fragment {
 
             //Log.e("", "Stop zipCode:" + stop_locations.get(0).getPostalCode());
             stop_detail = new LocationAddress();
-            if (stop_locations.size() > 0) {
-                stop_detail.setLongitude(stop_locations.get(0).getLongitude());
-                stop_detail.setLatitude(stop_locations.get(0).getLatitude());
-                stop_detail.setAddress(stop);
-                stop_detail.setLocation(stop);
-                stop_detail.setCountryName(stop_locations.get(0).getCountryName());
-                stop_detail.setLocality(stop_locations.get(0).getLocality());
-                stop_detail.setZipCode(stop_locations.get(0).getPostalCode());
+            if(stop_locations!=null) {
+                if (stop_locations.size() > 0) {
+                    stop_detail.setLongitude(stop_locations.get(0).getLongitude());
+                    stop_detail.setLatitude(stop_locations.get(0).getLatitude());
+                    stop_detail.setAddress(stop);
+                    stop_detail.setLocation(stop);
+                    stop_detail.setCountryName(stop_locations.get(0).getCountryName());
+                    stop_detail.setLocality(stop_locations.get(0).getLocality());
+                    stop_detail.setZipCode(stop_locations.get(0).getPostalCode());
+                }
             }
         }
         String destination = destination_train.getText().toString();
@@ -1079,14 +1111,16 @@ public class Fragment_PickUpTrain extends Fragment {
 
 
             destination_detail = new LocationAddress();
-            if (destination_locations.size() > 0) {
-                destination_detail.setLongitude(destination_locations.get(0).getLongitude());
-                destination_detail.setLatitude(destination_locations.get(0).getLatitude());
-                destination_detail.setAddress(destination);
-                destination_detail.setLocation(destination);
-                destination_detail.setCountryName(destination_locations.get(0).getCountryName());
-                destination_detail.setLocality(destination_locations.get(0).getLocality());
-                destination_detail.setZipCode(destination_locations.get(0).getPostalCode());
+            if(destination_locations != null) {
+                if (destination_locations.size() > 0) {
+                    destination_detail.setLongitude(destination_locations.get(0).getLongitude());
+                    destination_detail.setLatitude(destination_locations.get(0).getLatitude());
+                    destination_detail.setAddress(destination);
+                    destination_detail.setLocation(destination);
+                    destination_detail.setCountryName(destination_locations.get(0).getCountryName());
+                    destination_detail.setLocality(destination_locations.get(0).getLocality());
+                    destination_detail.setZipCode(destination_locations.get(0).getPostalCode());
+                }
             }
         }
 

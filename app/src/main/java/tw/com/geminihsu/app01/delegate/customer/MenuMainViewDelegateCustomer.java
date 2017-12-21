@@ -27,7 +27,8 @@ public class MenuMainViewDelegateCustomer extends MenuMainViewDelegateBase {
 		//if (mainActivity.getSupportFragmentManager().findFragmentByTag(MultiLiveView.PARENT_FRAGMENT_TAG_ID) == null) {
 		ft.add(R.id.container, newFragment);
 		ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-		// ft.addToBackStack(Fragment_Liveview.class.getSimpleName());
+		//ft.addToBackStack(Fragment_Liveview.class.getSimpleName());
+		//ft.addToBackStack(null);
 		ft.commit();
 		//}
 	}

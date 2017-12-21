@@ -12,6 +12,7 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -45,6 +46,8 @@ public class Fragment_TrainPlanePickUp extends Fragment {
     private ViewPager viewPager;
     private static String currAddress = "";
 
+    private ItemsPagerAdapter itemsPagerAdapter;
+
     public Fragment_TrainPlanePickUp() {
         // Required empty public constructor
     }
@@ -64,11 +67,17 @@ public class Fragment_TrainPlanePickUp extends Fragment {
     public void onStop()
     {
         super.onStop();
+        Log.e("","onStop");
         //call to ViewPage to remove the pages
-        viewPager.removeAllViews();
+        //viewPager.removeAllViews();
 
         //make this to update the pager
-        viewPager.setAdapter(null);
+        //viewPager.setAdapter(null);
+        if(itemsPagerAdapter !=null)
+        {
+            mTabNamesList.clear();
+            itemsPagerAdapter.notifyDataSetChanged();
+        }
 
     }
     @Override
@@ -94,6 +103,7 @@ public class Fragment_TrainPlanePickUp extends Fragment {
         }
         }
 
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -102,6 +112,9 @@ public class Fragment_TrainPlanePickUp extends Fragment {
         viewPager = (ViewPager) view.findViewById(R.id.viewPager);
         //viewPager.setId(View.generateViewId());
         viewPager.setAdapter(new ItemsPagerAdapter(getChildFragmentManager(), mTabNamesList));
+        itemsPagerAdapter = new ItemsPagerAdapter(getChildFragmentManager(), mTabNamesList);
+        viewPager.setAdapter(itemsPagerAdapter);
+
         mToolbarSetupCallback.setupTabLayout(viewPager);
 
         return view;
@@ -110,6 +123,15 @@ public class Fragment_TrainPlanePickUp extends Fragment {
     public void onResume() {
         getActivity().setTitle(getString(R.string.client_train_pick_up));
         super.onResume();
+        if(itemsPagerAdapter !=null)
+        {
+            mTabNamesList.clear();
+            mTabNamesList.add(getString(R.string.tab_send_train));
+            mTabNamesList.add(getString(R.string.tab_pick_up_train));
+            itemsPagerAdapter.notifyDataSetChanged();
+            //viewPager.setAdapter(itemsPagerAdapter);
+            //itemsPagerAdapter.notifyDataSetChanged();
+        }
 
 
     }
