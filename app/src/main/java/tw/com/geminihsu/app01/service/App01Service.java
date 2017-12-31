@@ -1,45 +1,24 @@
 package tw.com.geminihsu.app01.service;
 
 import android.app.Service;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.util.Log;
-import android.widget.Toast;
 
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.Volley;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import tw.com.geminihsu.app01.BuildConfig;
-import tw.com.geminihsu.app01.ClientTakeRideActivity;
-import tw.com.geminihsu.app01.ClientTakeRideSearchActivity;
-import tw.com.geminihsu.app01.MenuMainActivity;
 import tw.com.geminihsu.app01.bean.AccountInfo;
-import tw.com.geminihsu.app01.bean.App01libObjectKey;
 import tw.com.geminihsu.app01.bean.NormalOrder;
 import tw.com.geminihsu.app01.common.Constants;
-import tw.com.geminihsu.app01.utils.ConfigSharedPreferencesUtil;
 import tw.com.geminihsu.app01.utils.JsonPutsUtil;
 import tw.com.geminihsu.app01.utils.RealmUtil;
 import tw.com.geminihsu.app01.utils.ThreadPoolUtil;
-import tw.com.geminihsu.app01.utils.Utility;
 
 /**
  * Created by geminihsu on 2016/11/23.

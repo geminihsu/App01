@@ -35,22 +35,24 @@ public class Utility {
         String phone_number = ConfigSharedPreferencesUtil.getUserName(mContext, configSharedPreferences);
         RealmUtil data = new RealmUtil(mContext);
         AccountInfo accountInfo = null;
-
-        accountInfo = data.queryAccount(Constants.ACCOUNT_PHONE_NUMBER, phone_number);
-        AccountInfo user = new AccountInfo();
-        if(accountInfo!=null) {
-            user.setId(accountInfo.getId());
-            user.setUid(accountInfo.getUid());
-            user.setName(accountInfo.getName());
-            user.setPhoneNumber(accountInfo.getPhoneNumber());
-            user.setIdentify(accountInfo.getIdentify());
-            user.setPassword(accountInfo.getPassword());
-            user.setConfirm_password(accountInfo.getConfirm_password());
-            user.setRecommend_id(accountInfo.getRecommend_id());
-            user.setRole(accountInfo.getRole());
-            user.setDriver_type(accountInfo.getDriver_type());
-            user.setAccessKey(accountInfo.getAccessKey());
-            user.setRegisterToken(accountInfo.getRegisterToken());
+        AccountInfo user = null;
+        if(!phone_number.equals("")) {
+            accountInfo = data.queryAccount(Constants.ACCOUNT_PHONE_NUMBER, phone_number);
+            user = new AccountInfo();
+            if (accountInfo != null) {
+                user.setId(accountInfo.getId());
+                user.setUid(accountInfo.getUid());
+                user.setName(accountInfo.getName());
+                user.setPhoneNumber(accountInfo.getPhoneNumber());
+                user.setIdentify(accountInfo.getIdentify());
+                user.setPassword(accountInfo.getPassword());
+                user.setConfirm_password(accountInfo.getConfirm_password());
+                user.setRecommend_id(accountInfo.getRecommend_id());
+                user.setRole(accountInfo.getRole());
+                user.setDriver_type(accountInfo.getDriver_type());
+                user.setAccessKey(accountInfo.getAccessKey());
+                user.setRegisterToken(accountInfo.getRegisterToken());
+            }
         }
         return user;
     }

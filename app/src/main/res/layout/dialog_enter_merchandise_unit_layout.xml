@@ -41,6 +41,7 @@
         android:paddingTop="50dp"
         android:layout_weight="1"
         android:layout_gravity="center_horizontal"
+        android:inputType="numberDecimal"
         android:hint="@string/unit_hit_length"
         android:gravity="center_vertical"
         />
@@ -49,6 +50,7 @@
         android:layout_height="wrap_content"
         android:paddingTop="50dp"
         android:layout_weight="1"
+        android:inputType="numberDecimal"
         android:layout_gravity="center_horizontal"
         android:hint="@string/unit_hit_width"
         android:gravity="center_vertical"
@@ -58,33 +60,45 @@
         android:layout_height="wrap_content"
         android:paddingTop="50dp"
         android:layout_weight="1"
+        android:inputType="numberDecimal"
         android:layout_gravity="center_horizontal"
         android:hint="@string/unit_hit_high"
         android:gravity="center_vertical"
         />
         </LinearLayout>
-
+    <View
+        android:id="@+id/titlebuttonDivider"
+        android:layout_width="match_parent"
+        android:layout_height="1dip"
+        android:background="@color/filter_pop_list_divider_color" />
     <LinearLayout
-        android:id="@+id/button_layout"
-        android:layout_width="fill_parent"
+        android:id="@+id/buttonPanel"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_gravity="bottom"
-        >
+        android:orientation="horizontal" >
+
+        <Button
+            android:id="@+id/sure_action"
+            android:layout_width="fill_parent"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:background="@color/transparent"
+            android:textColor="@color/filter_pop_list_button_txt_color"
+            android:text="@string/dialog_get_on_car_comfirm"/>
+        <View
+            android:id="@+id/border"
+            android:layout_width="1dip"
+            android:layout_height="match_parent"
+            android:background="@color/filter_pop_list_divider_color" />
+
         <Button
             android:id="@+id/cancel_action"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/cancel_take_spec"
-            />
-        <Button
-            android:id="@+id/sure_action"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/dialog_get_on_car_comfirm"
-            />
+            android:background="@color/transparent"
+            android:textColor="@color/filter_pop_list_button_txt_color"
+            android:text="@string/cancel_take_spec"/>
     </LinearLayout>
 
 </LinearLayout>

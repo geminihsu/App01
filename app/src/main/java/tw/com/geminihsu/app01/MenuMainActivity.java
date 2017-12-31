@@ -2,7 +2,6 @@ package tw.com.geminihsu.app01;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -20,17 +19,12 @@ import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 //import android.support.v7.widget.ShareActionProvider;
-import android.support.v7.widget.ShareActionProvider;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
@@ -39,25 +33,16 @@ import android.widget.Toast;
 
 import com.google.android.gms.location.LocationListener;
 
-import tw.com.geminihsu.app01.bean.AccountInfo;
 import tw.com.geminihsu.app01.callback.FragmentViewListener;
 import tw.com.geminihsu.app01.fragment.Fragment_BeginOrder;
 import tw.com.geminihsu.app01.fragment.Fragment_BeginOrderInteractive;
-import tw.com.geminihsu.app01.fragment.Fragment_ClientAirPlanePickUp;
-import tw.com.geminihsu.app01.fragment.Fragment_Client_Service;
-import tw.com.geminihsu.app01.fragment.Fragment_Client_SubService;
 import tw.com.geminihsu.app01.fragment.Fragment_MerchandiseDorkPickUp;
-import tw.com.geminihsu.app01.fragment.Fragment_Support;
-import tw.com.geminihsu.app01.fragment.Fragment_TrainPlanePickUp;
-import tw.com.geminihsu.app01.common.Constants;
 import tw.com.geminihsu.app01.delegate.MenuMainViewDelegateBase;
 import tw.com.geminihsu.app01.delegate.customer.MenuMainViewDelegateCustomer;
-import tw.com.geminihsu.app01.delegate.driver.MenuMainViewDelegateDriver;
 import tw.com.geminihsu.app01.service.App01Service;
-import tw.com.geminihsu.app01.utils.RealmBackupRestore;
 import tw.com.geminihsu.app01.utils.Utility;
 
-public class MenuMainActivity extends AppCompatActivity implements Fragment_BeginOrder.TabLayoutSetupCallback,Fragment_ClientAirPlanePickUp.TabLayoutSetupCallback,Fragment_TrainPlanePickUp.TabLayoutSetupCallback,Fragment_MerchandiseDorkPickUp.TabLayoutSetupCallback,
+public class MenuMainActivity extends AppCompatActivity implements Fragment_BeginOrder.TabLayoutSetupCallback,Fragment_MerchandiseDorkPickUp.TabLayoutSetupCallback,
         Fragment_BeginOrderInteractive.OnListItemClickListener,LocationListener,FragmentViewListener {
 
     private BroadcastReceiver notifyAccountExpiredBroadcastReceiver;//當收到通知後跳到登入頁面

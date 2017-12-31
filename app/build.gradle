@@ -9,7 +9,7 @@ repositories {
 
 
 android {
-    compileSdkVersion 23
+    compileSdkVersion 24
     buildToolsVersion "24.0.2"
 
     defaultConfig {
@@ -18,6 +18,14 @@ android {
         targetSdkVersion 24
         versionCode 1
         versionName "1.0"
+
+
+
+        javaCompileOptions {
+            annotationProcessorOptions {
+                includeCompileClasspath false
+            }
+        }
 
         multiDexEnabled true
     }

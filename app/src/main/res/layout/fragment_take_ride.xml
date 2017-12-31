@@ -152,6 +152,7 @@
                     android:layout_width="fill_parent"
                     android:layout_height="match_parent"
                     android:orientation="horizontal"
+                    android:id="@+id/taxi_take_ride_departure_linearLayout"
                     >
                     <TextView
                         android:id="@+id/phone"
@@ -181,6 +182,82 @@
                         android:src="@drawable/ic_device_gps_fixed"
                         />
                  </LinearLayout>
+                <LinearLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:id="@+id/train_take_ride_departure_linearLayout"
+                    android:visibility="gone"
+                    >
+                    <TextView
+                        android:id="@+id/train_phone"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:ellipsize="middle"
+                        android:singleLine="true"
+                        android:paddingLeft="20dp"
+                        android:text="@string/txt_take_departure"
+                        android:textColor="@color/btn_bouns_title"
+                        />
+                    <RadioGroup
+                        android:id="@+id/departure_train"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:orientation="horizontal" >
+
+                        <RadioButton
+                            android:id="@+id/departure_tra_train"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/address_devicename_txt"
+                            android:text="@string/pick_up_tra_train" />
+
+                        <RadioButton
+                            android:id="@+id/departure_thsr_train"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/bg_gray"
+                            android:checked="true"
+                            android:text="@string/pick_up_thsr_train" />
+                    </RadioGroup>
+                        />
+                </LinearLayout>
+                <LinearLayout
+                    android:id="@+id/train_take_ride_departure_station_linearLayout"
+                    android:layout_width="fill_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:visibility="gone"
+                    >
+                    <TextView
+                        android:id="@+id/departure_location_txt"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:ellipsize="middle"
+                        android:singleLine="true"
+                        android:paddingLeft="20dp"
+                        android:layout_gravity="center_vertical"
+                        android:text="@string/pick_up_train"
+                        android:textColor="@color/btn_bouns_title"
+                        />
+                    <Spinner android:id="@+id/train_departure_spinner"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginRight="10dp"
+                        android:drawSelectorOnTop="true"
+                        />
+                    <ImageButton
+                        android:id="@+id/train_departure_button"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@color/transparent"
+                        android:layout_gravity="center_vertical"
+                        android:paddingRight="10dp"
+                        android:src="@drawable/ic_arrowdown"
+                        />
+                </LinearLayout>
                 <LinearLayout
                     android:layout_width="fill_parent"
                     android:layout_height="match_parent"
@@ -218,6 +295,7 @@
                     android:layout_width="fill_parent"
                     android:layout_height="match_parent"
                     android:orientation="horizontal"
+                    android:id="@+id/taxi_take_ride_destination_linearLayout"
                     >
                     <TextView
                         android:id="@+id/txt_destination"
@@ -245,6 +323,81 @@
                         android:layout_height="wrap_content"
                         android:background="@color/transparent"
                         android:src="@drawable/ic_image_control_point"
+                        />
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:id="@+id/train_take_ride_destination_linearLayout"
+                    android:visibility="gone"
+                    >
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:ellipsize="middle"
+                        android:singleLine="true"
+                        android:paddingLeft="20dp"
+                        android:text="@string/txt_take_destination"
+                        android:textColor="@color/btn_bouns_title"
+                        />
+                    <RadioGroup
+                        android:id="@+id/destination_train"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:orientation="horizontal" >
+
+                        <RadioButton
+                            android:id="@+id/destination_tra_train"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/address_devicename_txt"
+                            android:text="@string/pick_up_tra_train" />
+
+                        <RadioButton
+                            android:id="@+id/destination_thsr_train"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/bg_gray"
+                            android:checked="true"
+                            android:text="@string/pick_up_thsr_train" />
+                    </RadioGroup>
+                    />
+                </LinearLayout>
+                <LinearLayout
+                    android:id="@+id/train_take_ride_destination_station_linearLayout"
+                    android:layout_width="fill_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:visibility="gone"
+                    >
+                    <TextView
+                        android:id="@+id/destination_location_txt"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:ellipsize="middle"
+                        android:singleLine="true"
+                        android:paddingLeft="20dp"
+                        android:layout_gravity="center_vertical"
+                        android:text="@string/pick_up_train"
+                        android:textColor="@color/btn_bouns_title"
+                        />
+                    <Spinner android:id="@+id/train_destination_spinner"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginRight="10dp"
+                        android:drawSelectorOnTop="true"
+                        />
+                    <ImageButton
+                        android:id="@+id/train_des_button"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@color/transparent"
+                        android:layout_gravity="center_vertical"
+                        android:paddingRight="10dp"
+                        android:src="@drawable/ic_arrowdown"
                         />
                 </LinearLayout>
             </LinearLayout>

@@ -24,6 +24,7 @@ import tw.com.geminihsu.app01.bean.AccountInfo;
 import tw.com.geminihsu.app01.bean.NormalOrder;
 import tw.com.geminihsu.app01.bean.OrderLocationBean;
 import tw.com.geminihsu.app01.common.Constants;
+import tw.com.geminihsu.app01.delegate.OneRidePage.TakeRideViewDelegateBaseOneRide;
 import tw.com.geminihsu.app01.serverbean.ServerSpecial;
 import tw.com.geminihsu.app01.utils.DateTimeUtil;
 import tw.com.geminihsu.app01.utils.JsonPutsUtil;
@@ -75,7 +76,7 @@ public class SendMerchandiseActivity extends Activity {
                 b.putInt(Constants.ARG_POSITION, Integer.valueOf(order.getTicket_id()));
                 intent.putExtras(b);
                 startActivity(intent);
-                //finish();
+                finish();
 
             }
 
@@ -95,7 +96,7 @@ public class SendMerchandiseActivity extends Activity {
         if (bundle != null) {
             if (bundle.containsKey(Constants.ARG_POSITION)){
                 choice = bundle.getInt(Constants.ARG_POSITION);
-                order = (NormalOrder)bundle.getSerializable(ClientTakeRideActivity.BUNDLE_ORDER_TICKET_ID);
+                order = (NormalOrder)bundle.getSerializable(TakeRideViewDelegateBaseOneRide.BUNDLE_ORDER_TICKET_ID);
 
                 displayLayout();
             }else

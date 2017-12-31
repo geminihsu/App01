@@ -70,7 +70,7 @@
             android:layout_height="wrap_content"
             android:background="@color/transparent"
             android:textColor="@color/filter_pop_list_button_txt_color"
-            android:text="@string/g_ok"/>
+            android:text="@string/dialog_get_on_car_comfirm"/>
         <View
             android:id="@+id/border"
             android:layout_width="1dip"
@@ -84,7 +84,7 @@
             android:layout_weight="1"
             android:background="@color/transparent"
             android:textColor="@color/filter_pop_list_button_txt_color"
-            android:text="@string/g_cancel"/>
+            android:text="@string/cancel_take_spec"/>
     </LinearLayout>
     
 	<!-- </android.support.v4.widget.SwipeRefreshLayout> -->

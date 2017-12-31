@@ -64,6 +64,7 @@ import tw.com.geminihsu.app01.adapter.CommentListItemAdapter;
 import tw.com.geminihsu.app01.bean.LocationAddress;
 import tw.com.geminihsu.app01.bean.USerBookmark;
 import tw.com.geminihsu.app01.common.Constants;
+import tw.com.geminihsu.app01.delegate.OneRidePage.TakeRideViewDelegateBaseOneRide;
 import tw.com.geminihsu.app01.utils.FileUtil;
 import tw.com.geminihsu.app01.utils.JsonPutsUtil;
 import tw.com.geminihsu.app01.utils.RealmUtil;
@@ -314,7 +315,7 @@ public class OrderMapActivity extends Activity implements  LocationListener, Goo
             Intent i = new Intent();
             Bundle b = new Bundle();
             b.putSerializable(Constants.BUNDLE_LOCATION, coverGPSAddress(bookmarkTitle.getText().toString()));
-            b.putBoolean(ClientTakeRideActivity.BUNDLE_KEEP_BOOMARK,bookmark.isChecked());
+            b.putBoolean(TakeRideViewDelegateBaseOneRide.BUNDLE_KEEP_BOOMARK,bookmark.isChecked());
             b.putString(Constants.BUNDLE_MAP_LATITUDE, "" + latitude);
             b.putString(Constants.BUNDLE_MAP_LONGITUDE, "" + longitude);
             i.putExtras(b);
@@ -462,7 +463,7 @@ public class OrderMapActivity extends Activity implements  LocationListener, Goo
         Intent i = new Intent();
         Bundle b = new Bundle();
         b.putSerializable(Constants.BUNDLE_LOCATION, coverGPSAddress(bookmarkTitle.getText().toString()));
-        b.putBoolean(ClientTakeRideActivity.BUNDLE_KEEP_BOOMARK,bookmark.isChecked());
+        b.putBoolean(TakeRideViewDelegateBaseOneRide.BUNDLE_KEEP_BOOMARK,bookmark.isChecked());
         b.putString(Constants.BUNDLE_MAP_LATITUDE, "" + latitude);
         b.putString(Constants.BUNDLE_MAP_LONGITUDE, "" + longitude);
         if(getLocation)

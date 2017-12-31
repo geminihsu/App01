@@ -54,11 +54,11 @@ public class CommentActivity extends Activity {
     @Override
     protected void onStart() {
         super.onStart();
-        this.findViews();
+        findViews();
         Utility info = new Utility(this);
         AccountInfo accountInfo = info.getAccountInfo();
         //if(accountInfo!=null)
-         //   sendDataRequest.getAccountComment(accountInfo);
+       //     sendDataRequest.getAccountComment(accountInfo);
         getDataFromDB();
         listViewAdapter = new CommentListItemAdapter(CommentActivity.this, 0, mCommentListData);
         listView.setAdapter(listViewAdapter);

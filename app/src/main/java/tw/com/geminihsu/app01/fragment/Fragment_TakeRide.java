@@ -10,10 +10,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
@@ -34,6 +34,7 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -49,7 +50,6 @@ import io.realm.RealmResults;
 import tw.com.geminihsu.app01.BookmarksMapListActivity;
 import tw.com.geminihsu.app01.ClientTakeRideSearchActivity;
 import tw.com.geminihsu.app01.MainActivity;
-import tw.com.geminihsu.app01.MenuMainActivity;
 import tw.com.geminihsu.app01.OrderMapActivity;
 import tw.com.geminihsu.app01.R;
 import tw.com.geminihsu.app01.SendMerchandiseActivity;
@@ -59,8 +59,12 @@ import tw.com.geminihsu.app01.bean.AccountInfo;
 import tw.com.geminihsu.app01.bean.LocationAddress;
 import tw.com.geminihsu.app01.bean.NormalOrder;
 import tw.com.geminihsu.app01.bean.OrderLocationBean;
+import tw.com.geminihsu.app01.bean.RideType;
 import tw.com.geminihsu.app01.bean.USerBookmark;
 import tw.com.geminihsu.app01.common.Constants;
+import tw.com.geminihsu.app01.delegate.TwoRidePage.TakeRideAirPlaneDelegateBaseTwoRide;
+import tw.com.geminihsu.app01.delegate.TwoRidePage.TakeRideTrainDelegateBaseTwoRide;
+import tw.com.geminihsu.app01.serverbean.ServerBookmark;
 import tw.com.geminihsu.app01.serverbean.ServerSpecial;
 import tw.com.geminihsu.app01.utils.DateTimeUtil;
 import tw.com.geminihsu.app01.utils.JsonPutsUtil;
@@ -89,9 +93,19 @@ public class Fragment_TakeRide extends Fragment {
 
     final public static int TAKE_RIDE = 1;
     final public static int SEND_MERCHANDISE= 2;
+
+
     private LinearLayout linearLayout_date_picker;
-    private LinearLayout change;
-    private LinearLayout linearLayout_spec;
+    private LinearLayout linearLayout_merchandise_info;
+
+    private LinearLayout taxi_take_ride_departure_linearLayout;
+    private LinearLayout taxi_take_ride_destination_linearLayout;
+
+
+    private LinearLayout train_take_ride_departure_linearLayout;
+    private LinearLayout train_take_ride_departure_station_linearLayout;
+    private LinearLayout train_take_ride_destination_linearLayout;
+    private LinearLayout train_take_ride_destination_station_linearLayout;
     private ImageButton btn_datePicker;
     private ImageButton btn_timerPicker;
     private ImageButton departure;
@@ -111,7 +125,24 @@ public class Fragment_TakeRide extends Fragment {
     private EditText remark;
     private EditText merchandise_content;
     private EditText merchandise_weight;
+
+    private TextView departure_location;
+    private TextView destination_location;
     private TextView merchandise_unit;
+
+
+
+    private RadioGroup radioGroup_departure_location;
+    private RadioGroup radioGroup_destination_location;
+    private RadioButton departure_tra_train;
+    private RadioButton departure_thsr_train;
+
+    private RadioButton destination_tra_train;
+    private RadioButton destination_thsr_train;
+
+    private Spinner spinner_departure;
+    private Spinner spinner_destination;
+
     private int option;
 
     private final List<ClientTakeRideSelectSpecListItem> mCommentListData = new ArrayList<ClientTakeRideSelectSpecListItem>();;
@@ -150,28 +181,47 @@ public class Fragment_TakeRide extends Fragment {
     private String departure_info = "";
     private String destination_info = "";
     private String stop_info = "";
-    private ArrayList<String> specData = new ArrayList<>();
 
 
+    private static final String ARG_DATA = "data";
+    private RideType rideType;
+
+    private OnFragmentInteractionListener mListener;
+
+    private ArrayList<ServerBookmark> trainStationList;
+    private ServerBookmark currentLocation;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         setHasOptionsMenu(true);
-        // If activity recreated (such as from screen rotate), restore
-        // the previous article selection set by onSaveInstanceState().
-        // This is primarily necessary when in the two-pane layout.
-        //if (savedInstanceState != null) {
-        //   mCurrentPosition = savedInstanceState.getInt(Constants.ARG_POSITION);
-        //}
+        View v = inflater.inflate(R.layout.fragment_take_ride, container, false);
 
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_take_ride, container, false);
+        if(rideType != null) {
+
+
+            if(mListener != null) {
+                mListener.onFragmentCreated(this);
+            }
+        }
+        return v;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mListener.onFragmentResumed(this);
     }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
 
+        if (context instanceof OnFragmentInteractionListener) {
+            mListener = (OnFragmentInteractionListener) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement OnFragmentInteractionListener");
+        }
         sendDataRequest = new JsonPutsUtil(getActivity());
         sendDataRequest.setServerRequestOrderManagerCallBackFunction(new JsonPutsUtil.ServerRequestOrderManagerCallBackFunction() {
 
@@ -204,9 +254,22 @@ public class Fragment_TakeRide extends Fragment {
 
     }
 
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mListener = null;
+    }
+
+    public RideType getData() {
+        return rideType;
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+
         Bundle bundle = this.getArguments();
         if (bundle != null) {
             if (bundle.containsKey(Constants.ARG_POSITION)){
@@ -226,6 +289,7 @@ public class Fragment_TakeRide extends Fragment {
 
                 }
 
+
                 option = bundle.getInt(Constants.NEW_ORDER_CARGO_TYPE);
 
             }else
@@ -237,26 +301,65 @@ public class Fragment_TakeRide extends Fragment {
         {
             //Error!!!!
         }
+
+        if (getArguments() != null) {
+            rideType = (RideType) getArguments().getParcelable(ARG_DATA);
+            if(rideType != null)
+            {
+                option = rideType.option;
+                dType = rideType.dtype;
+                cargoType = rideType.cargoType;
+                currAddress = rideType.curAddress;
+                departure_info = currAddress;
+            }
+        }
+
+
     }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        this.findViews();
+        this.setLister();
+
+
+        //departure_address.setText(departure_info);
+        displayLayout();
+    }
+
 
     @Override
     public void onStart() {
         super.onStart();
 
-        this.findViews();
-        this.setLister();
-        departure_address.setText(departure_info);
-        displayLayout();
 
 
     }
 
+
+    public static Fragment newInstance(RideType rideType) {
+        Bundle args = new Bundle();
+        args.putParcelable(ARG_DATA, rideType);
+
+        Fragment f = new Fragment_TakeRide();
+        f.setArguments(args);
+        return f;
+    }
     private void findViews()
     {
         spec_list = new ArrayList<ClientTakeRideSelectSpecListItem>();
-        change = (LinearLayout) getView().findViewById (R.id.merchandise_content);
+        linearLayout_merchandise_info = (LinearLayout) getView().findViewById (R.id.merchandise_content);
         linearLayout_date_picker = (LinearLayout) getView().findViewById(R.id.date_layout);
-        linearLayout_spec = (LinearLayout) getView().findViewById(R.id.spec_require);
+        taxi_take_ride_departure_linearLayout = (LinearLayout) getView().findViewById(R.id.taxi_take_ride_departure_linearLayout);
+        taxi_take_ride_destination_linearLayout = (LinearLayout) getView().findViewById(R.id.taxi_take_ride_destination_linearLayout);
+
+        train_take_ride_departure_linearLayout = (LinearLayout) getView().findViewById(R.id.train_take_ride_departure_linearLayout);
+        train_take_ride_departure_station_linearLayout = (LinearLayout) getView() .findViewById(R.id.train_take_ride_departure_station_linearLayout);
+
+        train_take_ride_destination_linearLayout = (LinearLayout) getView().findViewById(R.id.train_take_ride_destination_linearLayout);
+        train_take_ride_destination_station_linearLayout = (LinearLayout) getView() .findViewById(R.id.train_take_ride_destination_station_linearLayout);
+
 
         btn_datePicker = (ImageButton) getView().findViewById(R.id.date_picker);
         btn_timerPicker = (ImageButton) getView().findViewById(R.id.time_picker);
@@ -264,8 +367,14 @@ public class Fragment_TakeRide extends Fragment {
         stop = (ImageButton) getView().findViewById(R.id.stop);
         destination = (ImageButton) getView().findViewById(R.id.destination);
         spec = (ImageButton) getView().findViewById(R.id.spec_option);
+
+        departure_location = (TextView) getView().findViewById(R.id.departure_location_txt);
+        destination_location =  (TextView) getView().findViewById(R.id.destination_location_txt);
+
         show_title = (TextView) getView().findViewById(R.id.txt_info);
         spec_value = (EditText) getView().findViewById(R.id.passenger_spec_value);
+        merchandise_unit = (TextView) getView().findViewById(R.id.merchandise_unit);
+
 
         radioGroup_type = (RadioGroup) getView().findViewById(R.id.source);
         realtime = (RadioButton)getView().findViewById(R.id.real_radio);
@@ -280,8 +389,19 @@ public class Fragment_TakeRide extends Fragment {
         destination_address = (EditText) getView().findViewById(R.id.destination_address);
         merchandise_content = (EditText) getView().findViewById(R.id.merchandise_content_info);
         merchandise_weight = (EditText) getView().findViewById(R.id.merchandise_weight);
-        merchandise_unit = (TextView) getView().findViewById(R.id.merchandise_unit);
 
+        radioGroup_departure_location = (RadioGroup) getView().findViewById(R.id.departure_train);
+        radioGroup_destination_location = (RadioGroup) getView().findViewById(R.id.destination_train);
+
+        departure_tra_train = (RadioButton) getView().findViewById(R.id.departure_tra_train);
+        departure_thsr_train = (RadioButton) getView().findViewById(R.id.departure_thsr_train);
+
+
+        destination_tra_train = (RadioButton) getView().findViewById(R.id.destination_tra_train);
+        destination_thsr_train = (RadioButton) getView().findViewById(R.id.destination_thsr_train);
+
+        spinner_departure = (Spinner) getView().findViewById(R.id.train_departure_spinner);
+        spinner_destination = (Spinner) getView().findViewById(R.id.train_destination_spinner);
 
         Date dateIfo=new Date();
         time.setText(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(dateIfo));
@@ -291,14 +411,62 @@ public class Fragment_TakeRide extends Fragment {
 
 
     private void displayLayout() {
-        if (option == Fragment_TakeRide.TAKE_RIDE) {
+        dataType = Constants.conversion_register_driver_account_result(Integer.valueOf(dType));
+        orderCargoType =  Constants.conversion_create_new_order_cargo_type_result(Integer.valueOf(cargoType));
+
+        //display cargo form
+        if (orderCargoType.equals(Constants.APP_REGISTER_ORDER_TYPE.K_REGISTER_ORDER_TYPE_SEND_MERCHANDISE)) {
             //getActionBar().setTitle(getString(R.string.client_take_ride_title));
-            change.setVisibility(View.GONE);
-        } else if (option == Fragment_TakeRide.SEND_MERCHANDISE){
-            show_title.setText(getString(R.string.txt_send_merchandise));
-            //getActionBar().setTitle(getString(R.string.client_send_merchandise_title));
-            change.setVisibility(View.VISIBLE);
+            linearLayout_merchandise_info.setVisibility(View.VISIBLE);
+        }else
+            linearLayout_merchandise_info.setVisibility(View.GONE);
+
+        //display the first title
+        if(orderCargoType.equals(Constants.APP_REGISTER_ORDER_TYPE.K_REGISTER_ORDER_TYPE_PICK_UP_AIRPORT) || orderCargoType.equals(Constants.APP_REGISTER_ORDER_TYPE.K_REGISTER_ORDER_TYPE_PICK_UP_TRAIN))
+        {
+            show_title.setVisibility(View.GONE);
         }
+
+        if(orderCargoType.equals(Constants.APP_REGISTER_ORDER_TYPE.K_REGISTER_ORDER_TYPE_PICK_UP_TRAIN))
+        {
+            getLocationFromDB("高鐵");
+
+            if(option == TakeRideTrainDelegateBaseTwoRide.TAKE_RIDE_TRAIN_DEPARTURE)
+            {
+                train_take_ride_destination_linearLayout.setVisibility(View.VISIBLE);
+                train_take_ride_destination_station_linearLayout.setVisibility(View.VISIBLE);
+                taxi_take_ride_destination_linearLayout.setVisibility(View.GONE);
+
+            }else  if(option == TakeRideTrainDelegateBaseTwoRide.TAKE_RIDE_TRAIN_DESTINATION)
+            {
+
+                train_take_ride_departure_linearLayout.setVisibility(View.VISIBLE);
+                train_take_ride_departure_station_linearLayout.setVisibility(View.VISIBLE);
+                taxi_take_ride_departure_linearLayout.setVisibility(View.GONE);
+            }
+
+        }
+
+        if(orderCargoType.equals(Constants.APP_REGISTER_ORDER_TYPE.K_REGISTER_ORDER_TYPE_PICK_UP_AIRPORT))
+        {
+            getLocationFromDB("機場");
+
+            if(option == TakeRideAirPlaneDelegateBaseTwoRide.TAKE_RIDE_AIRPORT_DEPARTURE)
+            {
+                destination_location.setText(getString(R.string.txt_take_destination));
+                train_take_ride_destination_station_linearLayout.setVisibility(View.VISIBLE);
+                taxi_take_ride_destination_linearLayout.setVisibility(View.GONE);
+
+            }else  if(option == TakeRideAirPlaneDelegateBaseTwoRide.TAKE_RIDE_AIRPORT_DESTINATION)
+            {
+
+                departure_location.setText(getString(R.string.txt_take_departure));
+                train_take_ride_departure_station_linearLayout.setVisibility(View.VISIBLE);
+                taxi_take_ride_departure_linearLayout.setVisibility(View.GONE);
+            }
+
+        }
+
     }
     private void setLister()
     {
@@ -514,25 +682,96 @@ public class Fragment_TakeRide extends Fragment {
                 calculateMerchandiseUnit();
             }
         });
+
+
+
+        spinner_departure.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapter, View v,
+                                       int position, long id) {
+                currentLocation = trainStationList.get(position);
+                departure_detail = new LocationAddress();
+                departure_detail.setLongitude(Double.parseDouble(currentLocation.getLng()));
+                departure_detail.setLatitude(Double.parseDouble(currentLocation.getLat()));
+                departure_detail.setAddress(currentLocation.getLocation()+"("+currentLocation.getStreetAddress().substring(3,currentLocation.getStreetAddress().length())+")");
+                departure_detail.setLocation(currentLocation.getLocation());
+                //departure_detail.setZipCode(currentLocation.getStreetAddress().substring(0,3));
+                String zipCode = (getTrainStationZip(currentLocation.getLocation()));
+                departure_detail.setZipCode(zipCode);
+                departure_detail.setCountryName("Taiwan");
+                departure_detail.setLocality(currentLocation.getStreetAddress());
+                departure_address.setText(departure_detail.getAddress());
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> arg0) {
+                // TODO Auto-generated method stub
+            }
+        });
+
+        spinner_destination.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapter, View v,
+                                       int position, long id) {
+                currentLocation = trainStationList.get(position);
+                destination_detail = new LocationAddress();
+                destination_detail.setLongitude(Double.parseDouble(currentLocation.getLng()));
+                destination_detail.setLatitude(Double.parseDouble(currentLocation.getLat()));
+                destination_detail.setAddress(currentLocation.getLocation()+"("+currentLocation.getStreetAddress().substring(3,currentLocation.getStreetAddress().length())+")");
+
+                destination_detail.setLocation(currentLocation.getLocation());
+                String zipCpde = (getTrainStationZip(currentLocation.getLocation()));
+                destination_detail.setZipCode(zipCpde);
+                destination_detail.setCountryName("Taiwan");
+                destination_detail.setLocality(currentLocation.getStreetAddress());
+                destination_address.setText(destination_detail.getAddress());
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> arg0) {
+                // TODO Auto-generated method stub
+            }
+        });
+
+
+        radioGroup_departure_location.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                if (checkedId == departure_thsr_train.getId()) {
+                    getLocationFromDB("高鐵");
+                } else {
+
+                    getLocationFromDB("火車");
+                }
+            }
+        });
+
+        radioGroup_destination_location.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                if (checkedId == destination_thsr_train.getId()) {
+                    getLocationFromDB("高鐵");
+                } else {
+
+                    getLocationFromDB("火車");
+                }
+            }
+        });
     }
 
 
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        if (option == Fragment_TakeRide.TAKE_RIDE) {
-            MenuItem item = menu.add(Menu.NONE, ACTIONBAR_MENU_ITEM_SUMMIT, Menu.NONE, getString(R.string.menu_take));
-            SpannableString spanString = new SpannableString(item.getTitle().toString());
-            spanString.setSpan(new ForegroundColorSpan(Color.WHITE), 0, spanString.length(), 0); //fix the color to white
-            item.setTitle(spanString);
-            item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-        }else if (option == Fragment_TakeRide.SEND_MERCHANDISE) {
-            MenuItem item = menu.add(Menu.NONE, ACTIONBAR_MENU_ITEM_SUMMIT, Menu.NONE, getString(R.string.sure_take_spec));
-            SpannableString spanString = new SpannableString(item.getTitle().toString());
-            spanString.setSpan(new ForegroundColorSpan(Color.WHITE), 0, spanString.length(), 0); //fix the color to white
-            item.setTitle(spanString);
-            item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-        }
+
+        MenuItem item = null;
+
+        if(orderCargoType.equals(Constants.APP_REGISTER_ORDER_TYPE.K_REGISTER_ORDER_TYPE_SEND_MERCHANDISE))
+            item = menu.add(Menu.NONE, ACTIONBAR_MENU_ITEM_SUMMIT, Menu.NONE, getString(R.string.sure_take_spec));
+        else
+            item = menu.add(Menu.NONE, ACTIONBAR_MENU_ITEM_SUMMIT, Menu.NONE, getString(R.string.menu_take));
+
+        SpannableString spanString = new SpannableString(item.getTitle().toString());
+        spanString.setSpan(new ForegroundColorSpan(Color.WHITE), 0, spanString.length(), 0); //fix the color to white
+        item.setTitle(spanString);
+        item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
         super.onCreateOptionsMenu(menu,inflater);
     }
 
@@ -542,16 +781,19 @@ public class Fragment_TakeRide extends Fragment {
         switch (item.getItemId()) {
 
             case ACTIONBAR_MENU_ITEM_SUMMIT:
-                //if (option == ClientTakeRideActivity.TAKE_RIDE) {
-                if(dataType == Constants.APP_REGISTER_DRIVER_TYPE.K_REGISTER_DRIVER_TYPE_UBER && destination_address.getText().toString().isEmpty())
+
+                if(departure_address.getText().toString().isEmpty() || (dataType.equals(Constants.APP_REGISTER_DRIVER_TYPE.K_REGISTER_DRIVER_TYPE_UBER) && destination_address.getText().toString().isEmpty()))
                     alert();
                else
-               if(!departure_address.getText().toString().isEmpty() && option != Fragment_TakeRide.SEND_MERCHANDISE)
+                    sendOrder();
+               /*if(!departure_address.getText().toString().isEmpty() && option != Fragment_TakeRide.SEND_MERCHANDISE)
                      sendOrder();
                else if(option == Fragment_TakeRide.SEND_MERCHANDISE && !departure_address.getText().toString().isEmpty() && !destination_address.getText().toString().isEmpty())
                      sendOrder();
                else
-                   alert();
+                   alert();*/
+
+
                 return true;
             case android.R.id.home:
                 // app icon in action bar clicked; goto parent activity.
@@ -662,7 +904,7 @@ public class Fragment_TakeRide extends Fragment {
         order.setPrice(price);
         order.setTip(tip);
 
-        if (option == Fragment_TakeRide.SEND_MERCHANDISE && !merchandise_content.getText().toString().equals("") && !merchandise_unit.getText().toString().equals(""))
+        if (orderCargoType.equals(Constants.APP_REGISTER_ORDER_TYPE.K_REGISTER_ORDER_TYPE_SEND_MERCHANDISE) && !merchandise_content.getText().toString().equals("") && !merchandise_unit.getText().toString().equals(""))
         {
             order.setRemark("\n"+getString(R.string.merchandise_content)+merchandise_content.getText().toString()+"\n"+getString(R.string.merchandise_weight)+merchandise_weight.getText().toString()+"\n"+getString(R.string.merchandise_unit)+merchandise_unit.getText().toString());
         }
@@ -687,6 +929,7 @@ public class Fragment_TakeRide extends Fragment {
             b.putSerializable(Fragment_TakeRide.BUNDLE_ORDER_TICKET_ID, order);
             question.putExtras(b);
             startActivity(question);
+
 
         }else {
             //sendDataRequest.putCreateQuickTaxiOrder(order);
@@ -715,6 +958,7 @@ public class Fragment_TakeRide extends Fragment {
         if(dialog==null) {
                 dialog = new Dialog(getActivity());
                 dialog.setContentView(R.layout.dialog_enter_order_price_layout);
+                dialog.setCancelable(false);
                 dialog.setTitle(getString(R.string.order_change_fee));
                 TextView content = (TextView) dialog.findViewById(R.id.txt_msg);
                 final EditText enter = (EditText) dialog.findViewById(R.id.editText_password);
@@ -747,6 +991,7 @@ public class Fragment_TakeRide extends Fragment {
                     @Override
                     public void onClick(View v) {
                         dialog.cancel();
+                        dialog = null;
                     }
                 });
 
@@ -754,6 +999,9 @@ public class Fragment_TakeRide extends Fragment {
 
         }
     }
+
+
+
 
     private void addUserLocationToBookMark(LocationAddress location)
     {
@@ -942,36 +1190,45 @@ public class Fragment_TakeRide extends Fragment {
         Utility info = new Utility(getActivity());
         AccountInfo user = info.getAccountInfo();
 
-        String data = "訂單類型:"+type+"\n"+"客戶電話:"+user.getPhoneNumber()+"\n"+orderType+departure_address_info+stop_address_info+destination_address_info+spec+markdetail;
-        if (option == Fragment_TakeRide.SEND_MERCHANDISE) {
-            //貨物快遞需填寫收件人資訊
-            //if (dataType == Constants.APP_REGISTER_DRIVER_TYPE.K_REGISTER_DRIVER_TYPE_TAXI) {
-                //if (option == TAKE_RIDE) {
-                //if (departure_detail.getLongitude()==0)
-                if(dataType == Constants.APP_REGISTER_DRIVER_TYPE.K_REGISTER_DRIVER_TYPE_TAXI) {
+        String merchandiseInfo = "";
+        if (orderCargoType.equals(Constants.APP_REGISTER_ORDER_TYPE.K_REGISTER_ORDER_TYPE_SEND_MERCHANDISE) && !merchandise_content.getText().toString().equals("") && !merchandise_unit.getText().toString().equals(""))
+        {
+            merchandiseInfo = "\n"+getString(R.string.merchandise_content)+merchandise_content.getText().toString()+"\n"+getString(R.string.merchandise_weight)+merchandise_weight.getText().toString()+"\n"+getString(R.string.merchandise_unit)+merchandise_unit.getText().toString();
+        }
+        String data = "訂單類型:"+type+"\n"+"客戶電話:"+user.getPhoneNumber()+"\n"+orderType+departure_address_info+stop_address_info+destination_address_info+spec+markdetail+merchandiseInfo;
+       /* if (option == Fragment_TakeRide.SEND_MERCHANDISE) {
+          if(dataType == Constants.APP_REGISTER_DRIVER_TYPE.K_REGISTER_DRIVER_TYPE_TAXI) {
                     parserAddressToGPS();
                     createTaxiOrder("" + option, "0", "0");
                 }else
                     provideOrderPrice();
-                //}
-                //else
-                //   createMechardiseOrder("" + option);
-            //}
         }else
-            confirmAlert(data);
+            confirmAlert(data);*/
+        confirmAlert(data);
 
-               /* }else
-                {
-                    NormalOrder order = createMechardiseOrder(""+SEND_MERCHANDISE);
-                    Intent question = new Intent(ClientTakeRideActivity.this, MerchandiseOrderActivity.class);
-                    Bundle b = new Bundle();
-                    b.putInt(Constants.ARG_POSITION, MerchandiseOrderActivity.SEND_MERCHANDISE);
-                    b.putSerializable(BUNDLE_ORDER_TICKET_ID, order);
-                    question.putExtras(b);
-                    startActivity(question);
-                }*/
     }
 
+    private String getTrainStationZip(String address) {
+
+        Geocoder fwdGeocoder = new Geocoder(getActivity());
+
+        String zipCode = "";
+        String departure = address;
+
+
+        List<Address> departure_locations = null;
+        try {
+            departure_locations = fwdGeocoder.getFromLocationName(departure, 10);
+        } catch (IOException e) {
+        }
+
+
+        zipCode = departure_locations.get(0).getPostalCode();
+
+
+
+        return zipCode;
+    }
     private void choiceSpecFilter() {
         //specData.clear();
         LayoutInflater inflater = LayoutInflater.from(getActivity());
@@ -1082,7 +1339,8 @@ public class Fragment_TakeRide extends Fragment {
                 .setCancelable(false)
                 .setPositiveButton(getString(R.string.cancel_take_spec), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-
+                        enter_alertDialog.cancel();
+                        enter_alertDialog = null;
                     }
                 })
                 .setNegativeButton(getString(R.string.sure_take_spec), new DialogInterface.OnClickListener() {
@@ -1100,8 +1358,14 @@ public class Fragment_TakeRide extends Fragment {
                             //   createMechardiseOrder("" + option);
                         }else
                         {
+
                             enter_alertDialog.cancel();
                             enter_alertDialog = null;
+                            if(dialog != null)
+                            {
+                                dialog.cancel();
+                                dialog = null;
+                            }
                             //讓使用者填入價錢和小費
                             provideOrderPrice();
                         }
@@ -1273,6 +1537,26 @@ public class Fragment_TakeRide extends Fragment {
         }
     }
 
+    //顯示車站資料
+    private void getLocationFromDB(String filterName) {
+        trainStationList  = new ArrayList<ServerBookmark>();
+        ArrayList<String> stationInfo = new ArrayList<String>();
+        RealmUtil database = new RealmUtil(getActivity());
+        RealmResults<ServerBookmark> tainList= database.queryServerBookmark();
+        for (ServerBookmark station:tainList)
+        {
+            if(station.getLocation().contains(filterName)) {
+                stationInfo.add(station.getLocation());
+                trainStationList.add(station);
+            }
+        }
+
+
+        ArrayAdapter arrayAdapter_location = new ArrayAdapter<String>(getActivity(), R.layout.spinner_item, stationInfo);
+        ArrayAdapter arrayAdapter_departure= new ArrayAdapter<String>(getActivity(), R.layout.spinner_item, stationInfo);
+        spinner_departure.setAdapter(arrayAdapter_location);
+        spinner_destination.setAdapter(arrayAdapter_departure);
+    }
 
     private void calculateMerchandiseUnit()
     {
@@ -1296,14 +1580,15 @@ public class Fragment_TakeRide extends Fragment {
                 @Override
                 public void onClick(View v) {
 
-                    double sum = 0.0;
+                    long sum = 0l;
                     if(!(unitLength.getText().toString().equals("") && unitLength.getText().toString().equals("") && unitLength.getText().toString().equals("")))
                     {
                         long len = Long.parseLong(unitLength.getText().toString());
                         long width = Long.parseLong(unitWidth.getText().toString());
                         long high = Long.parseLong(unitHigh.getText().toString());
                        sum = len * width * high / 28317;
-                       merchandise_unit.setText(""+Math.round(sum)+" "+getString(R.string.unit_total_count));
+                       Log.e(TAG,String.valueOf(Math.round(sum)));
+                       merchandise_unit.setText(String.valueOf(Math.round(sum)) + getActivity().getString(R.string.unit_total_count));
 
                     }else
                         merchandise_unit.setText("0才");
@@ -1325,5 +1610,10 @@ public class Fragment_TakeRide extends Fragment {
         }
         dialog.show();
     }
-
+    public interface OnFragmentInteractionListener {
+        // TODO: Update argument type and name
+        void onFragmentInteraction(int currentDataPosition);
+        void onFragmentCreated(Fragment_TakeRide demoFragment);
+        void onFragmentResumed(Fragment_TakeRide demoFragment);
+    }
 }

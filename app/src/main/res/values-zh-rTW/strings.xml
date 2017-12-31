@@ -427,8 +427,8 @@
 
 
     <!-- Fragment_ClientAirPlanePickUp -->
-    <string name="tab_send">送機</string>
-    <string name="tab_pick_up">接機</string>
+    <string name="tab_send_airport">送機</string>
+    <string name="tab_pick_up_airport">接機</string>
     <string name="tab_send_train">前往車站</string>
     <string name="tab_pick_up_train">離開車站</string>
     <string name="tab_go_dock">前往港口</string>

@@ -96,6 +96,7 @@ public class OrderRecordListItemAdapter extends ArrayAdapter<OrderRecordListItem
         	 holder.departure.setText(item.departure);
         	 holder.destination.setText(item.destination);
 			 holder.pay_method.setText(item.pay_method);
+			 holder.car_status.setText(item.car_status);
 			 holder.car_status.setVisibility(item.car_status_Visibility);
 
 

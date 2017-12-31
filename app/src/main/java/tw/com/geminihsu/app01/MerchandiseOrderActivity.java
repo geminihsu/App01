@@ -17,6 +17,7 @@ import android.widget.TextView;
 import tw.com.geminihsu.app01.bean.AccountInfo;
 import tw.com.geminihsu.app01.bean.NormalOrder;
 import tw.com.geminihsu.app01.common.Constants;
+import tw.com.geminihsu.app01.delegate.OneRidePage.TakeRideViewDelegateBaseOneRide;
 import tw.com.geminihsu.app01.fragment.Fragment_BeginOrderList;
 import tw.com.geminihsu.app01.utils.RealmUtil;
 import tw.com.geminihsu.app01.utils.Utility;
@@ -265,7 +266,7 @@ public class MerchandiseOrderActivity extends Activity {
                     Intent question = new Intent(MerchandiseOrderActivity.this, SendMerchandiseActivity.class);
                     Bundle b = new Bundle();
                     b.putInt(Constants.ARG_POSITION, SendMerchandiseActivity.CLIENT_SEND_MERCHANDISE);
-                    b.putSerializable(ClientTakeRideActivity.BUNDLE_ORDER_TICKET_ID, order);
+                    b.putSerializable(TakeRideViewDelegateBaseOneRide.BUNDLE_ORDER_TICKET_ID, order);
                     question.putExtras(b);
                     startActivity(question);
                 }else

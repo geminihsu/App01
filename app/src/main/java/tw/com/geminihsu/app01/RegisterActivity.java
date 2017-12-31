@@ -330,49 +330,7 @@ public class RegisterActivity extends Activity {
     }
 
 
-    /*private void addDataToRealm(AccountBean model) {
-        realm.beginTransaction();
 
-        AccountBean accountDetailsModel = realm.createObject(AccountBean.class);
-        accountDetailsModel.setName(model.getName());
-        accountDetailsModel.setIdentify(model.getIdentify());
-        accountDetailsModel.setPhoneNumber(model.getPhoneNumber());
-        accountDetailsModel.setLoginPassword(model.getLoginPassword());
-        accountDetailsModel.setRecommendedId(model.getRecommendedId());
-        accountDetailsModelArrayList.add(accountDetailsModel);
-
-        realm.commitTransaction();
-
-    }
-
-    public void updatePersonDetails(AccountBean model,int position,String personID) {
-        AccountBean editPersonDetails = realm.where(AccountBean.class).equalTo("id", personID).findFirst();
-        realm.beginTransaction();
-        editPersonDetails.setName(model.getName());
-        editPersonDetails.setIdentify(model.getIdentify());
-        editPersonDetails.setPhoneNumber(model.getPhoneNumber());
-        editPersonDetails.setLoginPassword(model.getLoginPassword());
-        editPersonDetails.setRecommendedId(model.getRecommendedId());
-        realm.commitTransaction();
-
-        accountDetailsModelArrayList.set(position, editPersonDetails);
-    }
-
-
-    private void getAllUsers() {
-        RealmResults<AccountBean> results = realm.where(AccountBean.class).findAll();
-        accountDetailsModelArrayList.clear();
-        realm.beginTransaction();
-
-        for (int i = 0; i < results.size(); i++) {
-            accountDetailsModelArrayList.add(results.get(i));
-        }
-
-        if(results.size()>0)
-            id = realm.where(AccountBean.class).max("id").intValue() + 1;
-        realm.commitTransaction();
-        //personDetailsAdapter.notifyDataSetChanged();
-    }*/
 
     private void alert()
     {

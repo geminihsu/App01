@@ -27,7 +27,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -63,15 +62,17 @@ import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import tw.com.geminihsu.app01.ClientTakeRideActivity;
 import tw.com.geminihsu.app01.ClientTakeRideSearchActivity;
 import tw.com.geminihsu.app01.MainActivity;
 import tw.com.geminihsu.app01.R;
+import tw.com.geminihsu.app01.TakeRideMenuActivity;
 import tw.com.geminihsu.app01.bean.AccountInfo;
 import tw.com.geminihsu.app01.bean.LocationAddress;
 import tw.com.geminihsu.app01.bean.NormalOrder;
 import tw.com.geminihsu.app01.bean.OrderLocationBean;
 import tw.com.geminihsu.app01.common.Constants;
+import tw.com.geminihsu.app01.delegate.OneRidePage.TakeRideViewDelegateBaseOneRide;
+import tw.com.geminihsu.app01.delegate.TwoRidePage.TakeRideTrainDelegateBaseTwoRide;
 import tw.com.geminihsu.app01.utils.DateTimeUtil;
 import tw.com.geminihsu.app01.utils.JsonPutsUtil;
 import tw.com.geminihsu.app01.utils.ThreadPoolUtil;
@@ -463,12 +464,12 @@ public class Fragment_Client_SubService extends Fragment  implements LocationLis
 
                  orderCargoType =  Constants.APP_REGISTER_ORDER_TYPE.K_REGISTER_ORDER_TYPE_TAKE_RIDE;
 
-                 Intent question = new Intent(getActivity(), ClientTakeRideActivity.class);
+                 Intent question = new Intent(getActivity(), TakeRideMenuActivity.class);
                  Bundle b = new Bundle();
-                 b.putInt(Constants.ARG_POSITION, ClientTakeRideActivity.TAKE_RIDE);
-                 b.putInt(ClientTakeRideActivity.BUNDLE_ORDER_DRIVER_TYPE, dataType.value());
-                 b.putInt(ClientTakeRideActivity.BUNDLE_ORDER_CARGO_TYPE, orderCargoType.value());
-                 b.putString(ClientTakeRideActivity.BUNDLE_ORDER_CUR_ADDRESS, curAddress);
+                 b.putInt(Constants.ARG_POSITION, TakeRideViewDelegateBaseOneRide.TAKE_RIDE);
+                 b.putInt(TakeRideViewDelegateBaseOneRide.BUNDLE_ORDER_DRIVER_TYPE, dataType.value());
+                 b.putInt(TakeRideViewDelegateBaseOneRide.BUNDLE_ORDER_CARGO_TYPE, orderCargoType.value());
+                 b.putString(TakeRideViewDelegateBaseOneRide.BUNDLE_ORDER_CUR_ADDRESS, curAddress);
 
                  question.putExtras(b);
                  startActivity(question);
@@ -488,12 +489,12 @@ public class Fragment_Client_SubService extends Fragment  implements LocationLis
                      orderCargoType = Constants.APP_REGISTER_ORDER_TYPE.K_REGISTER_ORDER_TYPE_SEND_MERCHANDISE;
 
 
-                     Intent question = new Intent(getActivity(), ClientTakeRideActivity.class);
+                     Intent question = new Intent(getActivity(), TakeRideMenuActivity.class);
                      Bundle b = new Bundle();
-                     b.putInt(Constants.ARG_POSITION, ClientTakeRideActivity.SEND_MERCHANDISE);
-                     b.putInt(ClientTakeRideActivity.BUNDLE_ORDER_DRIVER_TYPE, dataType.value());
-                     b.putInt(ClientTakeRideActivity.BUNDLE_ORDER_CARGO_TYPE, orderCargoType.value());
-                     b.putString(ClientTakeRideActivity.BUNDLE_ORDER_CUR_ADDRESS, curAddress);
+                     b.putInt(Constants.ARG_POSITION, TakeRideViewDelegateBaseOneRide.SEND_MERCHANDISE);
+                     b.putInt(TakeRideViewDelegateBaseOneRide.BUNDLE_ORDER_DRIVER_TYPE, dataType.value());
+                     b.putInt(TakeRideViewDelegateBaseOneRide.BUNDLE_ORDER_CARGO_TYPE, orderCargoType.value());
+                     b.putString(TakeRideViewDelegateBaseOneRide.BUNDLE_ORDER_CUR_ADDRESS, curAddress);
 
 
                      question.putExtras(b);
@@ -516,7 +517,7 @@ public class Fragment_Client_SubService extends Fragment  implements LocationLis
              public void onClick(View v) {
                  orderCargoType =  Constants.APP_REGISTER_ORDER_TYPE.K_REGISTER_ORDER_TYPE_PICK_UP_AIRPORT;
 
-                 Fragment newFragment = new Fragment_ClientAirPlanePickUp();
+                 /*Fragment newFragment = new Fragment_ClientAirPlanePickUp();
                  FragmentTransaction transaction = getFragmentManager().beginTransaction();
                  Bundle b = new Bundle();
                  b.putInt(ClientTakeRideActivity.BUNDLE_ORDER_DRIVER_TYPE, dataType.value());
@@ -527,7 +528,17 @@ public class Fragment_Client_SubService extends Fragment  implements LocationLis
                  transaction.replace(R.id.container, newFragment);
                  transaction.addToBackStack(null);
 
-                 transaction.commit();
+                 transaction.commit();*/
+
+                 Intent question = new Intent(getActivity(), TakeRideMenuActivity.class);
+                 Bundle b = new Bundle();
+                 b.putInt(Constants.ARG_POSITION, TakeRideViewDelegateBaseOneRide.TAKE_RIDE);
+                 b.putInt(TakeRideViewDelegateBaseOneRide.BUNDLE_ORDER_DRIVER_TYPE, dataType.value());
+                 b.putInt(TakeRideViewDelegateBaseOneRide.BUNDLE_ORDER_CARGO_TYPE, orderCargoType.value());
+                 b.putString(TakeRideViewDelegateBaseOneRide.BUNDLE_ORDER_CUR_ADDRESS, curAddress);
+
+                 question.putExtras(b);
+                 startActivity(question);
              }
          });
 
@@ -537,7 +548,7 @@ public class Fragment_Client_SubService extends Fragment  implements LocationLis
              public void onClick(View v) {
                  orderCargoType =  Constants.APP_REGISTER_ORDER_TYPE.K_REGISTER_ORDER_TYPE_PICK_UP_TRAIN;
 
-                 Bundle b = new Bundle();
+                /* Bundle b = new Bundle();
                  b.putInt(Constants.ARG_POSITION, ClientTakeRideActivity.TAKE_RIDE);
                  b.putInt(ClientTakeRideActivity.BUNDLE_ORDER_DRIVER_TYPE, dataType.value());
                  b.putInt(ClientTakeRideActivity.BUNDLE_ORDER_CARGO_TYPE, orderCargoType.value());
@@ -550,7 +561,16 @@ public class Fragment_Client_SubService extends Fragment  implements LocationLis
                  transaction.replace(R.id.container, newFragment);
                  //transaction.addToBackStack(null);
 
-                 transaction.commit();
+                 transaction.commit();*/
+                 Intent question = new Intent(getActivity(), TakeRideMenuActivity.class);
+                 Bundle b = new Bundle();
+                 b.putInt(Constants.ARG_POSITION, TakeRideTrainDelegateBaseTwoRide.TAKE_RIDE_TRAIN_DEPARTURE);
+                 b.putInt(TakeRideViewDelegateBaseOneRide.BUNDLE_ORDER_DRIVER_TYPE, dataType.value());
+                 b.putInt(TakeRideViewDelegateBaseOneRide.BUNDLE_ORDER_CARGO_TYPE, orderCargoType.value());
+                 b.putString(TakeRideViewDelegateBaseOneRide.BUNDLE_ORDER_CUR_ADDRESS, curAddress);
+
+                 question.putExtras(b);
+                 startActivity(question);
              }
          });
      }

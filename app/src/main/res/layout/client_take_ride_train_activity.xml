@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent"
+	android:background="@color/bg_gray"
+	android:orientation="vertical" android:id="@+id/main_layout" >
+	<FrameLayout
+
+		android:id="@+id/fragment_container"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent" />
+	<LinearLayout
+		android:id="@+id/linearLayout_tab"
+		android:layout_width="fill_parent"
+		android:layout_height="fill_parent"
+		android:background="@color/bg_gray"
+		android:visibility="gone"
+		android:orientation="vertical">
+	<TextView
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_gravity="center_horizontal"
+		android:paddingTop="20dp"
+		android:paddingBottom="20dp"
+		android:textColor="@color/btn_bouns_title"
+		android:textSize="@dimen/default_text_address_size_sp"
+		android:textStyle="bold"
+		android:text="@string/txt_pick_up_airplane"
+
+		/>
+	<android.support.v4.view.ViewPager
+		xmlns:android="http://schemas.android.com/apk/res/android"
+		xmlns:app="http://schemas.android.com/apk/res-auto"
+		android:id="@+id/viewPager"
+		android:layout_width="fill_parent"
+		android:layout_height="fill_parent"
+
+		>
+	<android.support.v4.view.PagerTabStrip
+		android:id="@+id/pager_header"
+		android:background="@color/btn_bouns_record"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:layout_gravity="top"
+		android:paddingBottom="4dp"
+		android:paddingTop="4dp"
+
+		/>
+
+	</android.support.v4.view.ViewPager>
+	</LinearLayout>
+</LinearLayout>
